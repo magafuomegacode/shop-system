@@ -1,5 +1,7 @@
 # ===== Dockerfile for Duka System (Laravel + Blade) =====
-FROM richarvey/nginx-php-fpm:latest
+# PHP 8.4 — inahitajika na Symfony packages (v8.1.7)
+
+FROM richarvey/nginx-php-fpm:php8.4
 
 # Set webroot kuwa public directory ya Laravel
 ENV WEBROOT /var/www/html/public
@@ -19,5 +21,5 @@ WORKDIR /var/www/html
 # Ruhusu start.sh kuwa executable
 RUN chmod +x /var/www/html/start.sh
 
-# Expose port (Railway ita-assign port yake mwenyewe)
+# Expose port (Render/Railway ita-assign port yake mwenyewe)
 EXPOSE 80
