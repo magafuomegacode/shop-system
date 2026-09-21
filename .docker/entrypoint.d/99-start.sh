@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# ===== Start Script for Duka System =====
 set -e
 
 echo "=========================================="
@@ -27,7 +26,10 @@ php artisan storage:link || true
 
 echo "🔒 Permissions..."
 chmod -R 775 storage bootstrap/cache || true
+chown -R www-data:www-data storage bootstrap/cache || true
 
 echo "=========================================="
 echo "✅ Deployment complete!"
 echo "=========================================="
+
+return 0
