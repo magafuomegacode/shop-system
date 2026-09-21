@@ -3,18 +3,21 @@
 
 FROM serversideup/php:8.4-fpm-nginx
 
-USER www-data
+# ===== Kama ROOT kwa hatua za kuandaa faili =====
 
 # Nakili faili zote za mradi
 COPY --chown=www-data:www-data . /var/www/html
 
-WORKDIR /var/www/html
-
-# Copy start.sh kwenye entrypoint.d (inaendeshwa kabla ya Nginx)
+# Copy start.sh kwenye entrypoint.d
 COPY --chown=www-data:www-data .docker/entrypoint.d/ /etc/entrypoint.d/
 
-# Ruhusu scripts kuwa executable
+# Ruhusu scripts kuwa executable (kama ROOT)
 RUN chmod +x /etc/entrypoint.d/*.sh
+
+# ===== Rudisha USER www-data kwa runtime =====
+USER www-data
+
+WORKDIR /var/www/html
 
 # Expose port
 EXPOSE 8080
