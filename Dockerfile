@@ -16,5 +16,6 @@ RUN chmod +x /var/www/html/start.sh
 # Expose port
 EXPOSE 8080
 
-# Override CMD — endesha start.sh kwanza, kisha /init
-CMD ["sh", "-c", "/var/www/html/start.sh && exec /init"]
+# CMD ya default — /init inaanzisha Nginx + PHP-FPM
+# start.sh itaendeshwa na entrypoint ya serversideup
+CMD ["/init"]
