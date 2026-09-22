@@ -118,7 +118,6 @@
         <div class="bg-white rounded-2xl p-8 mb-6 shadow-sm">
             <div class="flex items-start justify-between gap-4 pb-6 border-b border-slate-200">
                 <div>
-                    {{-- ✅ System name from settings --}}
                     <h1 class="text-3xl font-bold text-slate-900">
                         {{ strtoupper($systemName) }}
                     </h1>
@@ -199,12 +198,13 @@
                             <tr>
                                 <th class="text-center w-10">#</th>
                                 <th class="text-left">Product</th>
-                                <th class="text-left w-24">SKU</th>
-                                <th class="text-center w-16">Unit</th>
-                                <th class="text-center w-20">Stock</th>
-                                <th class="text-right w-24">Cost</th>
-                                <th class="text-right w-28">Selling</th>
-                                <th class="text-right w-28">Added By</th>
+                                <th class="text-left w-20">SKU</th>
+                                <th class="text-center w-14">Unit</th>
+                                <th class="text-center w-14">Size</th>
+                                <th class="text-center w-16">Stock</th>
+                                <th class="text-right w-20">Cost</th>
+                                <th class="text-right w-24">Selling</th>
+                                <th class="text-right w-24">Added By</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -215,6 +215,12 @@
                                     $stockQty = $stock ? (int) $stock->quantity : 0;
                                     $minQty = $stock ? (int) $stock->min_quantity : 5;
                                     $isLowStock = $stockQty <= $minQty;
+
+                                    // Size display — remove trailing zeros
+                                    $sizeDisplay = '—';
+                                    if ($product->size !== null && $product->size !== '') {
+                                        $sizeDisplay = rtrim(rtrim(number_format((float) $product->size, 2, '.', ''), '0'), '.');
+                                    }
                                 @endphp
                                 <tr>
                                     <td class="text-center text-slate-500">{{ $i + 1 }}</td>
@@ -228,6 +234,7 @@
                                         {{ $product->sku ?? '—' }}
                                     </td>
                                     <td class="text-center text-slate-600">{{ $product->unit ?? '—' }}</td>
+                                    <td class="text-center font-semibold text-slate-900">{{ $sizeDisplay }}</td>
                                     <td class="text-center font-semibold {{ $isLowStock ? 'text-red-600' : 'text-slate-900' }}">
                                         {{ $stockQty }}
                                     </td>
@@ -245,7 +252,7 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="4" class="text-left uppercase text-xs tracking-wide">Subtotal</td>
+                                <td colspan="5" class="text-left uppercase text-xs tracking-wide">Subtotal</td>
                                 <td class="text-center">
                                     @php
                                         $storeStockTotal = 0;

@@ -23,7 +23,7 @@
     </div>
 
     @if($errors->any())
-        <div class="fade-in-up d-2 bg-red-500/20 border border-red-500/40 text-red-200 px-4 py-3 rounded-xl mb-6 text-sm">
+        <div class="fade-in-up d-2 bg-red-500/20 border border-red-500/40 text-white px-4 py-3 rounded-xl mb-6 text-sm">
             @foreach($errors->all() as $error)
                 <p class="flex items-center gap-2">
                     <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">

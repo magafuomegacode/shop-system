@@ -16,9 +16,7 @@
             </div>
 
             <div class="flex items-center gap-2 flex-wrap w-full sm:w-auto">
-                {{-- Download button --}}
-                <button type="button"
-                        id="download-trigger"
+                <button type="button" id="download-trigger"
                         class="flex-1 sm:flex-initial flex-shrink-0 bg-stone-800/60 backdrop-blur border border-stone-600/50 hover:bg-stone-700/60 text-white text-sm font-semibold px-4 py-2.5 rounded-xl flex items-center justify-center gap-2 transition">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
@@ -26,7 +24,6 @@
                     <span>Download</span>
                 </button>
 
-                {{-- Add Product --}}
                 <a href="{{ route('products.create') }}"
                    class="flex-1 sm:flex-initial flex-shrink-0 bg-gradient-to-br from-yellow-600 to-lime-600 hover:from-yellow-700 hover:to-lime-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl flex items-center justify-center gap-2 transition shadow-lg">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -40,7 +37,7 @@
 
     {{-- Success --}}
     @if(session('success'))
-        <div class="fade-in-up d-2 bg-green-500/20 border border-green-500/40 text-green-200 px-4 py-3 rounded-xl mb-6 text-sm flex items-center gap-2">
+        <div class="fade-in-up d-2 bg-green-500/20 border border-green-500/40 text-white px-4 py-3 rounded-xl mb-6 text-sm flex items-center gap-2">
             <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
             </svg>
@@ -76,14 +73,14 @@
 
             @if(request()->hasAny(['search', 'store']))
                 <a href="{{ route('products.index') }}"
-                   class="bg-stone-800/60 backdrop-blur hover:bg-stone-700/60 text-stone-200 text-sm font-semibold px-5 py-2.5 rounded-xl transition text-center border border-stone-600/50">
+                   class="bg-stone-800/60 backdrop-blur hover:bg-stone-700/60 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition text-center border border-stone-600/50">
                     Clear
                 </a>
             @endif
         </form>
     </div>
 
-    {{-- Bordered Table (Khaki) --}}
+    {{-- Bordered Table --}}
     @if($products->count() > 0)
         <div class="fade-in-up bg-gradient-to-br from-stone-800 via-stone-700 to-stone-800 rounded-2xl overflow-hidden shadow-2xl border border-stone-600/50">
             <div class="overflow-x-auto">
@@ -95,6 +92,7 @@
                             <th class="px-4 py-3 text-left text-xs font-bold text-white uppercase tracking-wide border-r border-stone-600/50">SKU</th>
                             <th class="px-4 py-3 text-left text-xs font-bold text-white uppercase tracking-wide border-r border-stone-600/50">Store</th>
                             <th class="px-4 py-3 text-left text-xs font-bold text-white uppercase tracking-wide border-r border-stone-600/50">Unit</th>
+                            <th class="px-4 py-3 text-left text-xs font-bold text-white uppercase tracking-wide border-r border-stone-600/50">Size</th>
                             <th class="px-4 py-3 text-right text-xs font-bold text-white uppercase tracking-wide border-r border-stone-600/50">Price</th>
                             <th class="px-4 py-3 text-center text-xs font-bold text-white uppercase tracking-wide border-r border-stone-600/50">Stock</th>
                             <th class="px-4 py-3 text-left text-xs font-bold text-white uppercase tracking-wide border-r border-stone-600/50">Status</th>
@@ -108,10 +106,16 @@
                                 $stock = $product->stocks->firstWhere('store_id', $product->store_id);
                                 $stockQty = $stock ? (int) $stock->quantity : 0;
                                 $isLowStock = $stock && $stock->quantity <= $stock->min_quantity;
+
+                                // Size display — remove trailing zeros
+                                $sizeDisplay = '—';
+                                if ($product->size !== null && $product->size !== '') {
+                                    $sizeDisplay = rtrim(rtrim(number_format((float) $product->size, 2, '.', ''), '0'), '.');
+                                }
                             @endphp
                             <tr class="border-b border-stone-600/30 hover:bg-stone-700/40 transition {{ $i % 2 === 0 ? 'bg-stone-800/40' : 'bg-stone-700/20' }}">
                                 {{-- # --}}
-                                <td class="px-4 py-3 text-sm text-stone-300 border-r border-stone-600/30">
+                                <td class="px-4 py-3 text-sm text-white border-r border-stone-600/30">
                                     {{ $products->firstItem() + $i }}
                                 </td>
 
@@ -131,7 +135,7 @@
                                 </td>
 
                                 {{-- SKU --}}
-                                <td class="px-4 py-3 text-sm text-stone-300 font-mono border-r border-stone-600/30">
+                                <td class="px-4 py-3 text-sm text-white font-mono border-r border-stone-600/30">
                                     {{ $product->sku ?? '—' }}
                                 </td>
 
@@ -142,13 +146,18 @@
                                             {{ $product->store->name }}
                                         </span>
                                     @else
-                                        <span class="text-stone-500 text-xs">—</span>
+                                        <span class="text-white/60 text-xs">—</span>
                                     @endif
                                 </td>
 
                                 {{-- Unit --}}
-                                <td class="px-4 py-3 text-sm text-stone-300 border-r border-stone-600/30">
+                                <td class="px-4 py-3 text-sm text-white border-r border-stone-600/30">
                                     {{ $product->unit ?? '—' }}
+                                </td>
+
+                                {{-- Size --}}
+                                <td class="px-4 py-3 text-sm text-white font-semibold border-r border-stone-600/30">
+                                    {{ $sizeDisplay }}
                                 </td>
 
                                 {{-- Price --}}
@@ -182,7 +191,7 @@
                                         <p class="text-white font-medium truncate max-w-[120px]">
                                             {{ $product->creator->full_name ?? 'Unknown' }}
                                         </p>
-                                        <p class="text-stone-300 text-[10px]">
+                                        <p class="text-white/70 text-[10px]">
                                             {{ $product->created_at ? $product->created_at->format('d M Y') : '—' }}
                                         </p>
                                     </div>
@@ -194,7 +203,7 @@
                                         <a href="{{ route('products.show', $product) }}"
                                            class="w-7 h-7 rounded-lg bg-stone-800/60 hover:bg-stone-700/60 border border-stone-600/50 flex items-center justify-center transition"
                                            title="View">
-                                            <svg class="w-3.5 h-3.5 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                            <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                             </svg>

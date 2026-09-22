@@ -27,6 +27,7 @@ class ProductController extends Controller
             ->with([
                 'store:id,name',
                 'creator:id,full_name,role',
+                'stocks',
             ]);
 
         if ($search = $request->input('search')) {
@@ -78,6 +79,7 @@ class ProductController extends Controller
             'name'          => ['required', 'string', 'max:150'],
             'sku'           => ['nullable', 'string', 'max:50', 'unique:products,sku'],
             'unit'          => ['required', 'string', 'max:20'],
+            'size'          => ['nullable', 'numeric', 'min:0'],
             'cost_price'    => ['nullable', 'numeric', 'min:0'],
             'selling_price' => ['required', 'numeric', 'min:0'],
             'quantity'      => ['required', 'integer', 'min:0'],
@@ -98,6 +100,7 @@ class ProductController extends Controller
                 'name'          => $validated['name'],
                 'sku'           => $validated['sku'] ?? null,
                 'unit'          => $validated['unit'],
+                'size'          => $validated['size'] ?? null,
                 'cost_price'    => $validated['cost_price'] ?? null,
                 'selling_price' => $validated['selling_price'],
                 'is_active'     => $request->boolean('is_active', true),
@@ -132,10 +135,16 @@ class ProductController extends Controller
                 "Created product '{$product->name}' in '{$store->name}' with {$validated['quantity']} stock",
                 $product->id, 'products',
                 null,
-                ['name' => $product->name, 'store' => $store->name, 'quantity' => $validated['quantity']]
+                [
+                    'name'     => $product->name,
+                    'store'    => $store->name,
+                    'quantity' => $validated['quantity'],
+                    'unit'     => $validated['unit'],
+                    'size'     => $validated['size'] ?? null,
+                ]
             );
 
-            // 5. Notification: Product Added — ✅ FIXED: send() not push()
+            // 5. Notification: Product Added
             Notification::send(
                 $user->shop_id,
                 'product_added',
@@ -145,7 +154,7 @@ class ProductController extends Controller
                 'plus-circle'
             );
 
-            // 6. Notification: Low stock (kama initial quantity ni ndogo) — ✅ FIXED: send() not push()
+            // 6. Notification: Low stock
             if ($validated['quantity'] <= ($validated['min_quantity'] ?? 5)) {
                 Notification::send(
                     $user->shop_id,
@@ -178,7 +187,7 @@ class ProductController extends Controller
     {
         $this->authorizeProduct($product);
 
-        $product->load(['store:id,name,location', 'creator:id,full_name,role']);
+        $product->load(['store:id,name,location', 'creator:id,full_name,role', 'stocks']);
 
         $stock = Stock::where('product_id', $product->id)
             ->where('store_id', $product->store_id)
@@ -233,6 +242,7 @@ class ProductController extends Controller
             'name'          => ['required', 'string', 'max:150'],
             'sku'           => ['nullable', 'string', 'max:50', Rule::unique('products')->ignore($product->id)],
             'unit'          => ['required', 'string', 'max:20'],
+            'size'          => ['nullable', 'numeric', 'min:0'],
             'cost_price'    => ['nullable', 'numeric', 'min:0'],
             'selling_price' => ['required', 'numeric', 'min:0'],
             'quantity'      => ['required', 'integer', 'min:0'],
@@ -247,7 +257,7 @@ class ProductController extends Controller
         DB::beginTransaction();
 
         try {
-            $oldValues = $product->only(['name', 'selling_price', 'cost_price', 'store_id', 'is_active']);
+            $oldValues = $product->only(['name', 'selling_price', 'cost_price', 'store_id', 'is_active', 'unit', 'size']);
 
             // 1. Update product
             $product->update([
@@ -255,6 +265,7 @@ class ProductController extends Controller
                 'name'          => $validated['name'],
                 'sku'           => $validated['sku'] ?? null,
                 'unit'          => $validated['unit'],
+                'size'          => $validated['size'] ?? null,
                 'cost_price'    => $validated['cost_price'] ?? null,
                 'selling_price' => $validated['selling_price'],
                 'is_active'     => $request->boolean('is_active', true),
@@ -294,10 +305,10 @@ class ProductController extends Controller
                 "Updated product '{$product->name}' — stock: {$newQuantity}",
                 $product->id, 'products',
                 $oldValues,
-                $product->only(['name', 'selling_price', 'cost_price', 'store_id', 'is_active'])
+                $product->only(['name', 'selling_price', 'cost_price', 'store_id', 'is_active', 'unit', 'size'])
             );
 
-            // 5. Notification: Low stock (kama stock mpya ni ndogo) — ✅ FIXED: send() not push()
+            // 5. Notification: Low stock
             if ($newQuantity <= ($validated['min_quantity'] ?? 5)) {
                 Notification::send(
                     $user->shop_id,
@@ -394,7 +405,7 @@ class ProductController extends Controller
             fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
             fputcsv($file, [
-                'No.', 'Product Name', 'SKU', 'Store', 'Unit',
+                'No.', 'Product Name', 'SKU', 'Store', 'Unit', 'Size',
                 'Stock', 'Min Stock', 'Cost Price', 'Selling Price', 'Profit',
                 'Status', 'Added By', 'Role', 'Date Added',
             ]);
@@ -404,12 +415,19 @@ class ProductController extends Controller
                 $stockKey = $p->store_id . '-' . $p->id;
                 $stock = $stocks->get($stockKey);
 
+                // Size display — remove trailing zeros
+                $sizeDisplay = '-';
+                if ($p->size !== null && $p->size !== '') {
+                    $sizeDisplay = rtrim(rtrim(number_format((float) $p->size, 2, '.', ''), '0'), '.');
+                }
+
                 fputcsv($file, [
                     $i + 1,
                     $p->name,
                     $p->sku ?? '-',
                     $p->store->name ?? '-',
                     $p->unit ?? '-',
+                    $sizeDisplay,
                     $stock->quantity ?? 0,
                     $stock->min_quantity ?? '-',
                     number_format($p->cost_price ?? 0, 2, '.', ''),

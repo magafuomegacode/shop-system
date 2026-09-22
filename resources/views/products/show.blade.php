@@ -5,7 +5,7 @@
 @section('content')
 
     <a href="{{ route('products.index') }}"
-       class="inline-flex items-center gap-2 text-stone-300 hover:text-white text-sm mb-4 font-medium">
+       class="inline-flex items-center gap-2 text-lime-400 hover:text-lime-300 text-sm mb-4 font-bold">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
         </svg>
@@ -22,30 +22,42 @@
             </div>
             <div class="min-w-0">
                 <h2 class="text-white text-xl font-bold truncate">{{ $product->name }}</h2>
-                <p class="text-stone-300 text-sm truncate">
+                <p class="text-white text-sm truncate">
                     @if($product->store) {{ $product->store->name }} · @endif
                     {{ $product->sku ?? 'No SKU' }}
                 </p>
             </div>
         </div>
 
+        @php
+            // Size display — remove trailing zeros
+            $sizeDisplay = '—';
+            if ($product->size !== null && $product->size !== '') {
+                $sizeDisplay = rtrim(rtrim(number_format((float) $product->size, 2, '.', ''), '0'), '.');
+            }
+        @endphp
+
         <div class="grid grid-cols-2 gap-3">
             <div class="bg-stone-800/60 backdrop-blur rounded-xl p-4 border border-stone-600/50">
-                <p class="text-stone-300 text-xs">Selling Price</p>
+                <p class="text-white text-xs">Selling Price</p>
                 <p class="text-white font-bold text-lg mt-1">TSh {{ number_format((float) $product->selling_price, 0) }}</p>
             </div>
             <div class="bg-stone-800/60 backdrop-blur rounded-xl p-4 border border-stone-600/50">
-                <p class="text-stone-300 text-xs">Cost Price</p>
+                <p class="text-white text-xs">Cost Price</p>
                 <p class="text-white font-bold text-lg mt-1">
                     {{ $product->cost_price ? 'TSh ' . number_format((float) $product->cost_price, 0) : '—' }}
                 </p>
             </div>
             <div class="bg-stone-800/60 backdrop-blur rounded-xl p-4 border border-stone-600/50">
-                <p class="text-stone-300 text-xs">Unit</p>
+                <p class="text-white text-xs">Unit</p>
                 <p class="text-white font-semibold mt-1">{{ $product->unit ?? '—' }}</p>
             </div>
             <div class="bg-stone-800/60 backdrop-blur rounded-xl p-4 border border-stone-600/50">
-                <p class="text-stone-300 text-xs">Status</p>
+                <p class="text-white text-xs">Size</p>
+                <p class="text-white font-bold text-lg mt-1">{{ $sizeDisplay }}</p>
+            </div>
+            <div class="bg-stone-800/60 backdrop-blur rounded-xl p-4 border border-stone-600/50 col-span-2">
+                <p class="text-white text-xs">Status</p>
                 <p class="text-sm mt-1 font-semibold {{ $product->is_active ? 'text-green-400' : 'text-red-400' }}">
                     {{ $product->is_active ? 'Active' : 'Inactive' }}
                 </p>
@@ -72,17 +84,17 @@
 
             <div class="grid grid-cols-2 gap-3">
                 <div class="bg-stone-800/60 backdrop-blur rounded-xl p-4 border border-stone-600/50">
-                    <p class="text-stone-300 text-xs">Quantity in Stock</p>
+                    <p class="text-white text-xs">Quantity in Stock</p>
                     <p class="text-2xl font-bold mt-1
                         {{ $isOutOfStock ? 'text-red-400' : ($isLowStock ? 'text-yellow-400' : 'text-green-400') }}">
                         {{ $stockQty }}
                     </p>
-                    <p class="text-xs text-stone-400/70 mt-1">{{ $product->unit ?? 'pcs' }}</p>
+                    <p class="text-xs text-white/70 mt-1">{{ $product->unit ?? 'pcs' }}</p>
                 </div>
                 <div class="bg-stone-800/60 backdrop-blur rounded-xl p-4 border border-stone-600/50">
-                    <p class="text-stone-300 text-xs">Min Alert Level</p>
+                    <p class="text-white text-xs">Min Alert Level</p>
                     <p class="text-2xl font-bold mt-1 text-white">{{ $minQty }}</p>
-                    <p class="text-xs text-stone-400/70 mt-1">Alert when below</p>
+                    <p class="text-xs text-white/70 mt-1">Alert when below</p>
                 </div>
             </div>
 
@@ -135,7 +147,7 @@
                     <div class="min-w-0">
                         <p class="text-white font-medium text-sm">{{ $product->store->name }}</p>
                         @if($product->store->location)
-                            <p class="text-stone-300 text-xs">{{ $product->store->location }}</p>
+                            <p class="text-white text-xs">{{ $product->store->location }}</p>
                         @endif
                     </div>
                 </div>
@@ -151,7 +163,7 @@
                 </div>
                 <div>
                     <p class="text-white font-medium text-sm">{{ $product->creator->full_name ?? 'Unknown' }}</p>
-                    <p class="text-stone-300 text-xs capitalize">
+                    <p class="text-white text-xs capitalize">
                         {{ $product->creator->role ?? '' }} ·
                         @if($product->created_at)
                             {{ $product->created_at->format('d M Y, H:i') }}
@@ -166,7 +178,7 @@
     @if(auth()->user()->isAdmin() || auth()->user()->isOwner() || auth()->user()->isCashier())
         <div class="flex gap-3">
             <a href="{{ route('products.edit', $product) }}"
-               class="bg-gradient-to-br from-yellow-600 to-lime-600 hover:from-yellow-700 hover:to-lime-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition shadow-lg flex items-center gap-2">
+               class="bg-gradient-to-br from-yellow-600 to-lime-600 hover:from-yellow-700 hover:to-lime-700 text-white px-5 py-3 rounded-xl text-sm font-bold transition shadow-lg flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                 </svg>
