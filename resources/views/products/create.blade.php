@@ -5,7 +5,7 @@
 @section('content')
 
     <a href="{{ route('products.index') }}"
-       class="inline-flex items-center gap-2 text-stone-300 hover:text-white text-sm mb-4 fade-in-up d-1 font-medium">
+       class="inline-flex items-center gap-2 text-lime-400 hover:text-lime-300 text-sm mb-4 fade-in-up d-1 font-bold">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
         </svg>
@@ -16,7 +16,7 @@
         <div class="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-yellow-500/20 to-lime-500/20 rounded-full -mr-20 -mt-20 pointer-events-none"></div>
         <div class="relative z-10">
             <h2 class="text-white text-xl sm:text-2xl font-bold">Add New Product</h2>
-            <p class="text-stone-300 text-xs sm:text-sm mt-1">
+            <p class="text-white text-xs sm:text-sm mt-1">
                 You will be recorded as the one who added this product
             </p>
         </div>
@@ -40,21 +40,21 @@
 
         {{-- Added by --}}
         <div>
-            <label class="block text-xs font-semibold text-stone-300 mb-2">Added By</label>
+            <label class="block text-xs font-semibold text-white mb-2">Added By</label>
             <div class="flex items-center gap-2 bg-stone-800/60 backdrop-blur border border-stone-600/50 rounded-xl px-4 py-3">
                 <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-yellow-600 to-lime-600 flex items-center justify-center text-white font-bold text-xs shadow-lg">
                     {{ strtoupper(substr(auth()->user()->full_name, 0, 1)) }}
                 </div>
                 <div>
                     <p class="text-white text-sm font-semibold">{{ auth()->user()->full_name }}</p>
-                    <p class="text-stone-300 text-xs capitalize">{{ auth()->user()->role }}</p>
+                    <p class="text-white text-xs capitalize">{{ auth()->user()->role }}</p>
                 </div>
             </div>
         </div>
 
         {{-- Name --}}
         <div>
-            <label for="name" class="block text-xs font-semibold text-stone-300 mb-2">
+            <label for="name" class="block text-xs font-semibold text-white mb-2">
                 Product Name <span class="text-red-400">*</span>
             </label>
             <input type="text" name="name" id="name" value="{{ old('name') }}" required
@@ -65,7 +65,7 @@
         {{-- Store --}}
         <div>
             <div class="flex items-center justify-between mb-2">
-                <label for="store_id" class="block text-xs font-semibold text-stone-300">
+                <label for="store_id" class="block text-xs font-semibold text-white">
                     Store <span class="text-red-400">*</span>
                 </label>
                 <a href="{{ route('stores.create') }}"
@@ -85,19 +85,19 @@
                     </option>
                 @endforeach
             </select>
-            <p class="text-stone-400/70 text-xs mt-1">Product will be stored in this store</p>
+            <p class="text-white/70 text-xs mt-1">Product will be stored in this store</p>
         </div>
 
         {{-- SKU + Unit --}}
         <div class="grid grid-cols-2 gap-3">
             <div>
-                <label for="sku" class="block text-xs font-semibold text-stone-300 mb-2">SKU (optional)</label>
+                <label for="sku" class="block text-xs font-semibold text-white mb-2">SKU (optional)</label>
                 <input type="text" name="sku" id="sku" value="{{ old('sku') }}"
                        placeholder="e.g. CC500"
                        class="w-full bg-stone-800/60 border border-stone-600/50 text-white placeholder-stone-400/60 px-4 py-3 rounded-xl outline-none focus:border-lime-400 focus:ring-2 focus:ring-lime-400/30 transition">
             </div>
             <div>
-                <label for="unit" class="block text-xs font-semibold text-stone-300 mb-2">
+                <label for="unit" class="block text-xs font-semibold text-white mb-2">
                     Unit <span class="text-red-400">*</span>
                 </label>
                 <select name="unit" id="unit" required
@@ -130,13 +130,13 @@
         {{-- Prices --}}
         <div class="grid grid-cols-2 gap-3">
             <div>
-                <label for="cost_price" class="block text-xs font-semibold text-stone-300 mb-2">Cost Price (optional)</label>
+                <label for="cost_price" class="block text-xs font-semibold text-white mb-2">Cost Price (optional)</label>
                 <input type="number" name="cost_price" id="cost_price" value="{{ old('cost_price') }}"
                        min="0" step="0.01" placeholder="0"
                        class="w-full bg-stone-800/60 border border-stone-600/50 text-white placeholder-stone-400/60 px-4 py-3 rounded-xl outline-none focus:border-lime-400 focus:ring-2 focus:ring-lime-400/30 transition">
             </div>
             <div>
-                <label for="selling_price" class="block text-xs font-semibold text-stone-300 mb-2">
+                <label for="selling_price" class="block text-xs font-semibold text-white mb-2">
                     Selling Price <span class="text-red-400">*</span>
                 </label>
                 <input type="number" name="selling_price" id="selling_price" value="{{ old('selling_price') }}"
@@ -157,24 +157,24 @@
 
             <div class="grid grid-cols-2 gap-3">
                 <div>
-                    <label for="quantity" class="block text-xs font-semibold text-stone-300 mb-2">
+                    <label for="quantity" class="block text-xs font-semibold text-white mb-2">
                         Initial Quantity <span class="text-red-400">*</span>
                     </label>
                     <input type="number" name="quantity" id="quantity"
                            value="{{ old('quantity', 0) }}"
                            min="0" step="1" required placeholder="0"
                            class="w-full bg-stone-800/60 border border-stone-600/50 text-white placeholder-stone-400/60 px-4 py-3 rounded-xl outline-none focus:border-lime-400 focus:ring-2 focus:ring-lime-400/30 transition">
-                    <p class="text-stone-400/70 text-xs mt-1">How many items are in stock?</p>
+                    <p class="text-white/70 text-xs mt-1">How many items are in stock?</p>
                 </div>
                 <div>
-                    <label for="min_quantity" class="block text-xs font-semibold text-stone-300 mb-2">
+                    <label for="min_quantity" class="block text-xs font-semibold text-white mb-2">
                         Min Quantity (alert)
                     </label>
                     <input type="number" name="min_quantity" id="min_quantity"
                            value="{{ old('min_quantity', 5) }}"
                            min="0" step="1" placeholder="5"
                            class="w-full bg-stone-800/60 border border-stone-600/50 text-white placeholder-stone-400/60 px-4 py-3 rounded-xl outline-none focus:border-lime-400 focus:ring-2 focus:ring-lime-400/30 transition">
-                    <p class="text-stone-400/70 text-xs mt-1">Alert when stock is below this</p>
+                    <p class="text-white/70 text-xs mt-1">Alert when stock is below this</p>
                 </div>
             </div>
         </div>
@@ -183,17 +183,17 @@
         <div class="flex items-center gap-2">
             <input type="checkbox" name="is_active" id="is_active" value="1" checked
                    class="w-4 h-4 rounded border-stone-600 bg-stone-800/60 text-lime-500 focus:ring-lime-400/50">
-            <label for="is_active" class="text-sm text-stone-200">Active product</label>
+            <label for="is_active" class="text-sm text-white">Active product</label>
         </div>
 
         {{-- Buttons --}}
         <div class="flex items-center gap-3 pt-3">
             <button type="submit"
-                    class="flex-1 bg-gradient-to-br from-yellow-600 to-lime-600 hover:from-yellow-700 hover:to-lime-700 text-white font-semibold py-3 rounded-xl transition shadow-lg">
+                    class="flex-1 bg-gradient-to-br from-yellow-600 to-lime-600 hover:from-yellow-700 hover:to-lime-700 text-white font-bold py-3 rounded-xl transition shadow-lg">
                 Add Product
             </button>
             <a href="{{ route('products.index') }}"
-               class="px-5 py-3 rounded-xl bg-stone-800/60 hover:bg-stone-700/60 text-stone-200 text-sm font-medium transition border border-stone-600/50">
+               class="px-5 py-3 rounded-xl bg-stone-800/60 hover:bg-stone-700/60 text-white text-sm font-bold transition border border-stone-600/50">
                 Cancel
             </a>
         </div>
