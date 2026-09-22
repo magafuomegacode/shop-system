@@ -2,11 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\PasswordResetMail;
+use App\Mail\UserCredentialsMail;
 use App\Models\ActivityLog;
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -19,14 +24,12 @@ class UserController extends Controller
     {
         $user = Auth::user();
 
-        // Admin sees everyone; Owner sees only cashiers
         if ($user->isAdmin()) {
             $users = User::where('shop_id', $user->shop_id)
                 ->with(['store', 'creator'])
                 ->orderByDesc('created_at')
                 ->paginate(15);
         } else {
-            // Owner
             $users = User::where('shop_id', $user->shop_id)
                 ->where('role', 'cashier')
                 ->with(['store', 'creator'])
@@ -39,28 +42,21 @@ class UserController extends Controller
 
     /**
      * Show the form for creating a new user.
-     *
-     * Username is auto-generated: first 5 letters of name + user ID.
-     * Password is auto-generated: 5 random digits.
      */
     public function create()
     {
         $user = Auth::user();
-
-        // Which roles can this user create
         $canCreateRoles = $user->isAdmin() ? ['owner'] : ['cashier'];
 
         return view('users.create', compact('canCreateRoles'));
     }
 
     /**
-     * Store a newly created user.
+     * Store a newly created user and email credentials.
      */
     public function store(Request $request)
     {
         $currentUser = Auth::user();
-
-        // Role this user can create
         $allowedRole = $currentUser->isAdmin() ? 'owner' : 'cashier';
 
         $validated = $request->validate([
@@ -69,13 +65,9 @@ class UserController extends Controller
             'phone'     => ['nullable', 'string', 'max:20'],
         ]);
 
-        // ===== 1. Temporary username (replaced after we know the ID) =====
         $tempUsername = 'temp_' . Str::random(10);
-
-        // ===== 2. Auto-generate password: 5 random digits =====
         $plainPassword = str_pad((string) random_int(0, 99999), 5, '0', STR_PAD_LEFT);
 
-        // ===== 3. Create the user (no store_id — cashiers access all stores) =====
         $user = User::create([
             'shop_id'    => $currentUser->shop_id,
             'store_id'   => null,
@@ -89,37 +81,57 @@ class UserController extends Controller
             'created_by' => $currentUser->id,
         ]);
 
-        // ===== 4. Build official username: first 5 letters of name + ID =====
+        // Build official username
         $cleanName = preg_replace('/[^A-Za-z]/', '', $validated['full_name']);
         $prefix = strtolower(substr($cleanName, 0, 5));
         $username = $prefix . $user->id;
 
-        // Ensure uniqueness (edge case)
         while (User::where('username', $username)->where('id', '!=', $user->id)->exists()) {
             $username = $prefix . $user->id . random_int(1, 99);
         }
 
-        // ===== 5. Save the final username =====
         $user->update(['username' => $username]);
 
-        // ===== 6. Activity log =====
+        // ===== Tuma email kwa user =====
+        $emailStatus = 'no email provided';
+        if ($user->email) {
+            try {
+                $settings = [
+                    'system_name' => Setting::get($currentUser->shop_id, 'system_name', 'Duka System'),
+                    'phone'       => Setting::get($currentUser->shop_id, 'phone', ''),
+                    'email'       => Setting::get($currentUser->shop_id, 'email', ''),
+                ];
+
+                Mail::to($user->email)->send(
+                    new UserCredentialsMail($user, $plainPassword, $settings)
+                );
+
+                $emailStatus = 'email sent to ' . $user->email;
+                Log::info("Credentials email sent to: {$user->email}");
+
+            } catch (\Exception $e) {
+                $emailStatus = 'user created but email failed';
+                Log::error("Failed to send credentials email: " . $e->getMessage());
+            }
+        }
+
+        // Activity log
         ActivityLog::log(
             $currentUser->id,
             $currentUser->shop_id,
             null,
             'CREATE_USER',
             'users',
-            "Created new user: {$user->full_name} ({$user->role}) with username {$username}",
+            "Created new user: {$user->full_name} ({$user->role}) with username {$username} — {$emailStatus}",
             $user->id,
             'users',
             null,
             ['role' => $user->role, 'username' => $username]
         );
 
-        // ===== 7. Show credentials once =====
         return redirect()
             ->route('users.index')
-            ->with('success', "User {$user->full_name} created successfully!")
+            ->with('success', "User {$user->full_name} created successfully! ({$emailStatus})")
             ->with('new_credentials', [
                 'username'  => $username,
                 'password'  => $plainPassword,
@@ -185,7 +197,7 @@ class UserController extends Controller
     }
 
     /**
-     * Change a user's password.
+     * Change a user's password (admin/owner sets a new one).
      */
     public function changePassword(Request $request, User $user)
     {
@@ -208,27 +220,45 @@ class UserController extends Controller
     }
 
     /**
-     * Reset a user's password to a new random 5-digit code.
+     * Reset a user's password to a new random 5-digit code and email it.
      */
     public function resetPassword(User $user)
     {
         $this->authorizeUser($user);
         $currentUser = Auth::user();
 
-        // Generate new 5-digit password
         $plainPassword = str_pad((string) random_int(0, 99999), 5, '0', STR_PAD_LEFT);
 
         $user->update(['password' => Hash::make($plainPassword)]);
 
+        // ===== Tuma email kwa user =====
+        $emailStatus = 'no email provided';
+        if ($user->email) {
+            try {
+                $systemName = Setting::get($currentUser->shop_id, 'system_name', 'Duka System');
+
+                Mail::to($user->email)->send(
+                    new PasswordResetMail($user, $plainPassword, $systemName)
+                );
+
+                $emailStatus = 'email sent to ' . $user->email;
+                Log::info("Password reset email sent to: {$user->email}");
+
+            } catch (\Exception $e) {
+                $emailStatus = 'password reset but email failed';
+                Log::error("Failed to send password reset email: " . $e->getMessage());
+            }
+        }
+
         ActivityLog::log(
             $currentUser->id, $currentUser->shop_id, null,
             'RESET_PASSWORD', 'users',
-            "Reset password for: {$user->full_name}",
+            "Reset password for: {$user->full_name} — {$emailStatus}",
             $user->id, 'users'
         );
 
         return back()
-            ->with('success', "Password reset for {$user->full_name}!")
+            ->with('success', "Password reset for {$user->full_name}! ({$emailStatus})")
             ->with('new_credentials', [
                 'username'  => $user->username,
                 'password'  => $plainPassword,
@@ -296,12 +326,10 @@ class UserController extends Controller
     {
         $current = Auth::user();
 
-        // Must be in the same shop
         if ($target->shop_id !== $current->shop_id) {
             abort(403, 'Unauthorized.');
         }
 
-        // Admin can manage Owners, but not other Admins
         if ($current->isAdmin()) {
             if ($target->isAdmin() && $target->id !== $current->id) {
                 abort(403, 'You cannot manage another Admin.');
@@ -309,7 +337,6 @@ class UserController extends Controller
             return;
         }
 
-        // Owner can manage Cashiers only
         if ($current->isOwner()) {
             if (!$target->isCashier()) {
                 abort(403, 'You can only manage Cashiers.');
@@ -317,7 +344,6 @@ class UserController extends Controller
             return;
         }
 
-        // Cashier cannot manage anyone
         abort(403, 'Unauthorized.');
     }
 }
