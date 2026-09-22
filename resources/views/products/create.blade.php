@@ -58,7 +58,7 @@
                 Product Name <span class="text-red-400">*</span>
             </label>
             <input type="text" name="name" id="name" value="{{ old('name') }}" required
-                   placeholder="e.g. Coca Cola 500ml"
+                   placeholder="e.g. Coca Cola"
                    class="w-full bg-stone-800/60 border border-stone-600/50 text-white placeholder-stone-400/60 px-4 py-3 rounded-xl outline-none focus:border-lime-400 focus:ring-2 focus:ring-lime-400/30 transition">
         </div>
 
@@ -100,31 +100,51 @@
                 <label for="unit" class="block text-xs font-semibold text-white mb-2">
                     Unit <span class="text-red-400">*</span>
                 </label>
-                <select name="unit" id="unit" required
+                <select name="unit" id="unit" required onchange="toggleSizeInput()"
                         class="w-full bg-stone-800/60 border border-stone-600/50 text-white px-4 py-3 rounded-xl outline-none appearance-none focus:border-lime-400 focus:ring-2 focus:ring-lime-400/30 transition">
-                    <option value="" class="bg-stone-800 text-white">-- Select Unit --</option>
+                    <option value="" class="bg-stone-800 text-white" data-size="none">-- Select Unit --</option>
 
-                    <option value="pcs"    class="bg-stone-800 text-white" {{ old('unit', 'pcs') == 'pcs' ? 'selected' : '' }}>pcs (pieces)</option>
-                    <option value="kg"     class="bg-stone-800 text-white" {{ old('unit') == 'kg' ? 'selected' : '' }}>kg (kilogram)</option>
-                    <option value="g"      class="bg-stone-800 text-white" {{ old('unit') == 'g' ? 'selected' : '' }}>g (gram)</option>
-                    <option value="litre"  class="bg-stone-800 text-white" {{ old('unit') == 'litre' ? 'selected' : '' }}>litre</option>
-                    <option value="ml"     class="bg-stone-800 text-white" {{ old('unit') == 'ml' ? 'selected' : '' }}>ml (millilitre)</option>
-                    <option value="box"    class="bg-stone-800 text-white" {{ old('unit') == 'box' ? 'selected' : '' }}>box</option>
-                    <option value="pack"   class="bg-stone-800 text-white" {{ old('unit') == 'pack' ? 'selected' : '' }}>pack</option>
-                    <option value="carton" class="bg-stone-800 text-white" {{ old('unit') == 'carton' ? 'selected' : '' }}>carton</option>
-                    <option value="bottle" class="bg-stone-800 text-white" {{ old('unit') == 'bottle' ? 'selected' : '' }}>bottle</option>
-                    <option value="can"    class="bg-stone-800 text-white" {{ old('unit') == 'can' ? 'selected' : '' }}>can</option>
-                    <option value="sachet" class="bg-stone-800 text-white" {{ old('unit') == 'sachet' ? 'selected' : '' }}>sachet</option>
-                    <option value="dozen"  class="bg-stone-800 text-white" {{ old('unit') == 'dozen' ? 'selected' : '' }}>dozen</option>
-                    <option value="bundle" class="bg-stone-800 text-white" {{ old('unit') == 'bundle' ? 'selected' : '' }}>bundle</option>
-                    <option value="bag"    class="bg-stone-800 text-white" {{ old('unit') == 'bag' ? 'selected' : '' }}>bag</option>
-                    <option value="roll"   class="bg-stone-800 text-white" {{ old('unit') == 'roll' ? 'selected' : '' }}>roll</option>
-                    <option value="metre"  class="bg-stone-800 text-white" {{ old('unit') == 'metre' ? 'selected' : '' }}>metre</option>
-                    <option value="pair"   class="bg-stone-800 text-white" {{ old('unit') == 'pair' ? 'selected' : '' }}>pair</option>
-                    <option value="set"    class="bg-stone-800 text-white" {{ old('unit') == 'set' ? 'selected' : '' }}>set</option>
-                    <option value="other"  class="bg-stone-800 text-white" {{ old('unit') == 'other' ? 'selected' : '' }}>Other</option>
+                    <option value="pcs"    class="bg-stone-800 text-white" data-size="none"  {{ old('unit', 'pcs') == 'pcs' ? 'selected' : '' }}>pcs (pieces)</option>
+                    <option value="kg"     class="bg-stone-800 text-white" data-size="weight" data-label="kg"    {{ old('unit') == 'kg' ? 'selected' : '' }}>kg (kilogram)</option>
+                    <option value="g"      class="bg-stone-800 text-white" data-size="weight" data-label="g"     {{ old('unit') == 'g' ? 'selected' : '' }}>g (gram)</option>
+                    <option value="litre"  class="bg-stone-800 text-white" data-size="volume" data-label="L"     {{ old('unit') == 'litre' ? 'selected' : '' }}>litre</option>
+                    <option value="ml"     class="bg-stone-800 text-white" data-size="volume" data-label="ml"    {{ old('unit') == 'ml' ? 'selected' : '' }}>ml (millilitre)</option>
+                    <option value="box"    class="bg-stone-800 text-white" data-size="none"  {{ old('unit') == 'box' ? 'selected' : '' }}>box</option>
+                    <option value="pack"   class="bg-stone-800 text-white" data-size="none"  {{ old('unit') == 'pack' ? 'selected' : '' }}>pack</option>
+                    <option value="carton" class="bg-stone-800 text-white" data-size="none"  {{ old('unit') == 'carton' ? 'selected' : '' }}>carton</option>
+                    <option value="bottle" class="bg-stone-800 text-white" data-size="none"  {{ old('unit') == 'bottle' ? 'selected' : '' }}>bottle</option>
+                    <option value="can"    class="bg-stone-800 text-white" data-size="none"  {{ old('unit') == 'can' ? 'selected' : '' }}>can</option>
+                    <option value="sachet" class="bg-stone-800 text-white" data-size="none"  {{ old('unit') == 'sachet' ? 'selected' : '' }}>sachet</option>
+                    <option value="dozen"  class="bg-stone-800 text-white" data-size="none"  {{ old('unit') == 'dozen' ? 'selected' : '' }}>dozen</option>
+                    <option value="bundle" class="bg-stone-800 text-white" data-size="none"  {{ old('unit') == 'bundle' ? 'selected' : '' }}>bundle</option>
+                    <option value="bag"    class="bg-stone-800 text-white" data-size="none"  {{ old('unit') == 'bag' ? 'selected' : '' }}>bag</option>
+                    <option value="roll"   class="bg-stone-800 text-white" data-size="none"  {{ old('unit') == 'roll' ? 'selected' : '' }}>roll</option>
+                    <option value="metre"  class="bg-stone-800 text-white" data-size="none"  {{ old('unit') == 'metre' ? 'selected' : '' }}>metre</option>
+                    <option value="pair"   class="bg-stone-800 text-white" data-size="none"  {{ old('unit') == 'pair' ? 'selected' : '' }}>pair</option>
+                    <option value="set"    class="bg-stone-800 text-white" data-size="none"  {{ old('unit') == 'set' ? 'selected' : '' }}>set</option>
+                    <option value="other"  class="bg-stone-800 text-white" data-size="none"  {{ old('unit') == 'other' ? 'selected' : '' }}>Other</option>
                 </select>
             </div>
+        </div>
+
+        {{-- SIZE INPUT (Dynamic — Hidden by default) --}}
+        <div id="size-wrapper" class="hidden">
+            <label for="size" class="block text-xs font-semibold text-white mb-2">
+                <span id="size-label">Size</span> <span class="text-red-400">*</span>
+            </label>
+            <div class="flex items-center gap-2">
+                <input type="number" name="size" id="size"
+                       value="{{ old('size') }}"
+                       min="0" step="0.01" placeholder="0"
+                       class="flex-1 bg-stone-800/60 border border-stone-600/50 text-white placeholder-stone-400/60 px-4 py-3 rounded-xl outline-none focus:border-lime-400 focus:ring-2 focus:ring-lime-400/30 transition">
+                <span id="size-unit-display"
+                      class="px-4 py-3 rounded-xl bg-stone-800/60 border border-stone-600/50 text-lime-400 font-bold text-sm min-w-[60px] text-center">
+                    L
+                </span>
+            </div>
+            <p class="text-white/70 text-xs mt-1">
+                <span id="size-hint">Enter the size (e.g. 1.5 for 1.5L)</span>
+            </p>
         </div>
 
         {{-- Prices --}}
@@ -198,5 +218,55 @@
             </a>
         </div>
     </form>
+
+    {{-- JavaScript: Dynamic Size Input --}}
+    <script>
+        function toggleSizeInput() {
+            const unitSelect = document.getElementById('unit');
+            const selectedOption = unitSelect.options[unitSelect.selectedIndex];
+            const sizeType = selectedOption.getAttribute('data-size');
+            const sizeLabel = selectedOption.getAttribute('data-label') || '';
+
+            const sizeWrapper = document.getElementById('size-wrapper');
+            const sizeLabelEl = document.getElementById('size-label');
+            const sizeUnitDisplay = document.getElementById('size-unit-display');
+            const sizeHint = document.getElementById('size-hint');
+            const sizeInput = document.getElementById('size');
+
+            if (sizeType === 'none' || !sizeType) {
+                // Ficha size input
+                sizeWrapper.classList.add('hidden');
+                sizeInput.removeAttribute('required');
+                sizeInput.value = '';
+            } else {
+                // Onyesha size input
+                sizeWrapper.classList.remove('hidden');
+                sizeInput.setAttribute('required', 'required');
+
+                // Badilisha label na unit display
+                if (sizeType === 'weight') {
+                    sizeLabelEl.textContent = 'Weight';
+                    sizeUnitDisplay.textContent = sizeLabel;
+                    sizeHint.textContent = 'Enter the weight (e.g. 1.5 for 1.5' + sizeLabel + ')';
+                    sizeInput.placeholder = '0';
+                    sizeInput.setAttribute('step', '0.01');
+                } else if (sizeType === 'volume') {
+                    sizeLabelEl.textContent = 'Volume';
+                    sizeUnitDisplay.textContent = sizeLabel;
+                    sizeHint.textContent = 'Enter the volume (e.g. 1.5 for 1.5' + sizeLabel + ')';
+                    sizeInput.placeholder = '0';
+                    sizeInput.setAttribute('step', '0.01');
+                }
+            }
+        }
+
+        // Endesha mara ya kwanza (kama kuna old value)
+        document.addEventListener('DOMContentLoaded', function () {
+            const unitSelect = document.getElementById('unit');
+            if (unitSelect.value) {
+                toggleSizeInput();
+            }
+        });
+    </script>
 
 @endsection
