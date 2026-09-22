@@ -52,6 +52,15 @@
         </div>
     @endif
 
+    {{-- Errors --}}
+    @if($errors->any())
+        <div class="fade-in-up d-2 bg-red-500/20 border border-red-500/40 text-white px-4 py-3 rounded-xl mb-4 text-sm">
+            @foreach($errors->all() as $error)
+                <p>{{ $error }}</p>
+            @endforeach
+        </div>
+    @endif
+
     {{-- Info grid --}}
     <div class="fade-in-up d-2 grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
 
@@ -180,7 +189,7 @@
 
                 @if($user->is_active)
                     {{-- BLOCK BUTTON — RED --}}
-                    <button class="bg-red-600 hover:bg-red-700 text-white px-5 py-3 rounded-xl text-sm font-bold transition shadow-lg flex items-center gap-2">
+                    <button class="bg-yellow-600 hover:bg-yellow-700 text-white px-5 py-3 rounded-xl text-sm font-bold transition shadow-lg flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
                         </svg>
@@ -196,6 +205,21 @@
                     </button>
                 @endif
             </form>
+
+            {{-- DELETE BUTTON --}}
+            @if(auth()->user()->isAdmin() || (auth()->user()->isOwner() && $user->isCashier()))
+                <form method="POST" action="{{ route('users.destroy', $user) }}"
+                      onsubmit="return confirm('Are you sure you want to DELETE {{ $user->full_name }}? This action cannot be undone.');">
+                    @csrf
+                    @method('DELETE')
+                    <button class="bg-red-600 hover:bg-red-700 text-white px-5 py-3 rounded-xl text-sm font-bold transition shadow-lg flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                        Delete User
+                    </button>
+                </form>
+            @endif
         @endif
     </div>
 

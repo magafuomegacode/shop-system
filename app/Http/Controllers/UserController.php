@@ -81,7 +81,7 @@ class UserController extends Controller
             'created_by' => $currentUser->id,
         ]);
 
-        // Build official username
+        // Build official username: first 5 letters of name + ID
         $cleanName = preg_replace('/[^A-Za-z]/', '', $validated['full_name']);
         $prefix = strtolower(substr($cleanName, 0, 5));
         $username = $prefix . $user->id;
@@ -295,28 +295,57 @@ class UserController extends Controller
     }
 
     /**
-     * Remove (soft-delete: block only) the specified user.
+     * Soft-delete (block) the specified user.
+     *
+     * Admin can delete any user except other admins and themselves.
+     * Owner can delete cashiers only.
      */
     public function destroy(User $user)
     {
+        // 1. Basic shop check
         $this->authorizeUser($user);
         $currentUser = Auth::user();
 
+        // 2. Cannot delete yourself
         if ($user->id === $currentUser->id) {
             return back()->withErrors(['error' => 'You cannot delete your own account.']);
         }
 
+        // 3. Admin can delete owners & cashiers (but NOT other admins)
+        if ($currentUser->isAdmin()) {
+            if ($user->isAdmin()) {
+                return back()->withErrors(['error' => 'You cannot delete another Admin.']);
+            }
+            // Allowed — proceed
+        }
+
+        // 4. Owner can delete cashiers only
+        elseif ($currentUser->isOwner()) {
+            if (!$user->isCashier()) {
+                return back()->withErrors(['error' => 'You can only delete Cashiers.']);
+            }
+            // Allowed — proceed
+        }
+
+        // 5. Cashier cannot delete anyone
+        else {
+            abort(403, 'Unauthorized.');
+        }
+
+        // 6. Perform soft-delete (block the user)
         $name = $user->full_name;
         $user->update(['is_active' => false]);
 
         ActivityLog::log(
             $currentUser->id, $currentUser->shop_id, null,
             'DELETE_USER', 'users',
-            "Deleted (blocked) user: {$name}",
+            "Deleted (blocked) user: {$name} ({$user->role})",
             $user->id, 'users'
         );
 
-        return redirect()->route('users.index')->with('success', "User {$name} deleted!");
+        return redirect()
+            ->route('users.index')
+            ->with('success', "User {$name} has been deleted successfully!");
     }
 
     /**
@@ -326,10 +355,12 @@ class UserController extends Controller
     {
         $current = Auth::user();
 
+        // Must be in the same shop
         if ($target->shop_id !== $current->shop_id) {
             abort(403, 'Unauthorized.');
         }
 
+        // Admin can manage everyone except other admins (except themselves)
         if ($current->isAdmin()) {
             if ($target->isAdmin() && $target->id !== $current->id) {
                 abort(403, 'You cannot manage another Admin.');
@@ -337,6 +368,7 @@ class UserController extends Controller
             return;
         }
 
+        // Owner can manage cashiers only
         if ($current->isOwner()) {
             if (!$target->isCashier()) {
                 abort(403, 'You can only manage Cashiers.');
@@ -344,6 +376,7 @@ class UserController extends Controller
             return;
         }
 
+        // Cashier cannot manage anyone
         abort(403, 'Unauthorized.');
     }
 }
