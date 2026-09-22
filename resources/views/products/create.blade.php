@@ -22,6 +22,33 @@
         </div>
     </div>
 
+    {{-- ✅ SUCCESS MESSAGE — Kijani yenye nguvu --}}
+    <div id="success-message" class="hidden fade-in-up d-2 bg-gradient-to-r from-green-600 to-emerald-600 border-2 border-green-400 text-white px-5 py-4 rounded-xl mb-6 text-sm shadow-2xl shadow-green-500/50 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+            </svg>
+        </div>
+        <div class="flex-1">
+            <p class="font-bold text-white text-base">Success!</p>
+            <p class="text-white text-sm mt-0.5" id="success-text">Product added successfully!</p>
+        </div>
+    </div>
+
+    {{-- ❌ ERROR MESSAGE — Nyekundu yenye nguvu --}}
+    <div id="error-message" class="hidden fade-in-up d-2 bg-gradient-to-r from-red-600 to-rose-600 border-2 border-red-400 text-white px-5 py-4 rounded-xl mb-6 text-sm shadow-2xl shadow-red-500/50 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+            </svg>
+        </div>
+        <div class="flex-1">
+            <p class="font-bold text-white text-base">Error!</p>
+            <p class="text-white text-sm mt-0.5" id="error-text">Failed to add product.</p>
+        </div>
+    </div>
+
+    {{-- Errors (server-side) --}}
     @if($errors->any())
         <div class="fade-in-up d-2 bg-red-500/20 border border-red-500/40 text-white px-4 py-3 rounded-xl mb-6 text-sm">
             @foreach($errors->all() as $error)
@@ -35,7 +62,8 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('products.store') }}" class="fade-in-up d-2 bg-gradient-to-br from-stone-800 via-stone-700 to-stone-800 rounded-2xl p-5 sm:p-6 space-y-5 shadow-2xl border border-stone-600/50">
+    <form method="POST" action="{{ route('products.store') }}" id="product-form"
+          class="fade-in-up d-2 bg-gradient-to-br from-stone-800 via-stone-700 to-stone-800 rounded-2xl p-5 sm:p-6 space-y-5 shadow-2xl border border-stone-600/50">
         @csrf
 
         {{-- Added by --}}
@@ -127,7 +155,7 @@
             </div>
         </div>
 
-        {{-- SIZE INPUT (Dynamic — Hidden by default) --}}
+        {{-- SIZE INPUT (Dynamic) --}}
         <div id="size-wrapper" class="hidden">
             <label for="size" class="block text-xs font-semibold text-white mb-2">
                 <span id="size-label">Size</span> <span class="text-red-400">*</span>
@@ -208,9 +236,9 @@
 
         {{-- Buttons --}}
         <div class="flex items-center gap-3 pt-3">
-            <button type="submit"
-                    class="flex-1 bg-gradient-to-br from-yellow-600 to-lime-600 hover:from-yellow-700 hover:to-lime-700 text-white font-bold py-3 rounded-xl transition shadow-lg">
-                Add Product
+            <button type="submit" id="submit-btn"
+                    class="flex-1 bg-gradient-to-br from-yellow-600 to-lime-600 hover:from-yellow-700 hover:to-lime-700 text-white font-bold py-3 rounded-xl transition shadow-lg disabled:opacity-50">
+                <span id="submit-text">Add Product</span>
             </button>
             <a href="{{ route('products.index') }}"
                class="px-5 py-3 rounded-xl bg-stone-800/60 hover:bg-stone-700/60 text-white text-sm font-bold transition border border-stone-600/50">
@@ -219,8 +247,9 @@
         </div>
     </form>
 
-    {{-- JavaScript: Dynamic Size Input --}}
+    {{-- JavaScript: Dynamic Size Input + AJAX Form --}}
     <script>
+        // ===== Size Input Toggle =====
         function toggleSizeInput() {
             const unitSelect = document.getElementById('unit');
             const selectedOption = unitSelect.options[unitSelect.selectedIndex];
@@ -234,33 +263,115 @@
             const sizeInput = document.getElementById('size');
 
             if (sizeType === 'none' || !sizeType) {
-                // Ficha size input
                 sizeWrapper.classList.add('hidden');
                 sizeInput.removeAttribute('required');
                 sizeInput.value = '';
             } else {
-                // Onyesha size input
                 sizeWrapper.classList.remove('hidden');
                 sizeInput.setAttribute('required', 'required');
 
-                // Badilisha label na unit display
                 if (sizeType === 'weight') {
                     sizeLabelEl.textContent = 'Weight';
                     sizeUnitDisplay.textContent = sizeLabel;
                     sizeHint.textContent = 'Enter the weight (e.g. 1.5 for 1.5' + sizeLabel + ')';
-                    sizeInput.placeholder = '0';
-                    sizeInput.setAttribute('step', '0.01');
                 } else if (sizeType === 'volume') {
                     sizeLabelEl.textContent = 'Volume';
                     sizeUnitDisplay.textContent = sizeLabel;
                     sizeHint.textContent = 'Enter the volume (e.g. 1.5 for 1.5' + sizeLabel + ')';
-                    sizeInput.placeholder = '0';
-                    sizeInput.setAttribute('step', '0.01');
                 }
             }
         }
 
-        // Endesha mara ya kwanza (kama kuna old value)
+        // ===== AJAX Form Submission =====
+        (function () {
+            const form = document.getElementById('product-form');
+            const submitBtn = document.getElementById('submit-btn');
+            const submitText = document.getElementById('submit-text');
+            const successMsg = document.getElementById('success-message');
+            const successText = document.getElementById('success-text');
+            const errorMsg = document.getElementById('error-message');
+            const errorText = document.getElementById('error-text');
+
+            if (!form) return;
+
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                // Hide previous messages
+                successMsg.classList.add('hidden');
+                errorMsg.classList.add('hidden');
+
+                // Disable submit button
+                submitBtn.disabled = true;
+                submitText.textContent = 'Adding...';
+
+                // Get form data
+                const formData = new FormData(form);
+
+                // Send via fetch
+                fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: formData,
+                })
+                .then(async function (r) {
+                    const data = await r.json().catch(() => ({}));
+
+                    if (!r.ok) {
+                        if (data.errors) {
+                            const firstError = Object.values(data.errors).flat()[0];
+                            throw new Error(firstError || 'Validation failed.');
+                        }
+                        throw new Error(data.message || data.error || 'Failed to add product.');
+                    }
+
+                    return data;
+                })
+                .then(function (data) {
+                    // Success
+                    successText.textContent = data.message || 'Product added successfully!';
+                    successMsg.classList.remove('hidden');
+
+                    // Reset form (except store_id)
+                    const storeValue = document.getElementById('store_id').value;
+                    form.reset();
+                    document.getElementById('store_id').value = storeValue;
+
+                    // Hide size input
+                    document.getElementById('size-wrapper').classList.add('hidden');
+
+                    // Scroll to top
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                    // Auto-hide success message after 5 seconds
+                    setTimeout(function () {
+                        successMsg.classList.add('hidden');
+                    }, 5000);
+                })
+                .catch(function (err) {
+                    errorText.textContent = err.message;
+                    errorMsg.classList.remove('hidden');
+
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                    // Auto-hide error after 5 seconds
+                    setTimeout(function () {
+                        errorMsg.classList.add('hidden');
+                    }, 5000);
+                })
+                .finally(function () {
+                    submitBtn.disabled = false;
+                    submitText.textContent = 'Add Product';
+                });
+            });
+        })();
+
+        // ===== Run on load =====
         document.addEventListener('DOMContentLoaded', function () {
             const unitSelect = document.getElementById('unit');
             if (unitSelect.value) {
