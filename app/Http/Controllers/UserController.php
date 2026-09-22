@@ -295,7 +295,7 @@ class UserController extends Controller
     }
 
     /**
-     * Soft-delete (block) the specified user.
+     * Permanently delete the specified user.
      *
      * Admin can delete any user except other admins and themselves.
      * Owner can delete cashiers only.
@@ -332,20 +332,28 @@ class UserController extends Controller
             abort(403, 'Unauthorized.');
         }
 
-        // 6. Perform soft-delete (block the user)
+        // ===== HARD DELETE — Futa kabisa =====
         $name = $user->full_name;
-        $user->update(['is_active' => false]);
+        $role = $user->role;
 
+        // Futa user kabisa
+        $user->delete();
+
+        // Activity log — subject_id = null kwa sababu user amefutwa
         ActivityLog::log(
-            $currentUser->id, $currentUser->shop_id, null,
-            'DELETE_USER', 'users',
-            "Deleted (blocked) user: {$name} ({$user->role})",
-            $user->id, 'users'
+            $currentUser->id,
+            $currentUser->shop_id,
+            null,
+            'DELETE_USER',
+            'users',
+            "Permanently deleted user: {$name} ({$role})",
+            null,
+            'users'
         );
 
         return redirect()
             ->route('users.index')
-            ->with('success', "User {$name} has been deleted successfully!");
+            ->with('success', "User {$name} has been permanently deleted!");
     }
 
     /**
