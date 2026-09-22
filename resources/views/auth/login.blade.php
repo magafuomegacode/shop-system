@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="sw">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -9,7 +9,6 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     @php
         use App\Models\Setting;
-        // Try to get settings from the first shop (login page has no auth)
         $firstShop = \App\Models\Shop::first();
         $shopId = $firstShop ? $firstShop->id : 0;
         $systemName = Setting::get($shopId, 'system_name', 'Duka System');
@@ -19,19 +18,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * {
-            font-family: 'Poppins', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-            box-sizing: border-box;
-        }
-
-        html, body {
-            width: 100%;
-            overflow-x: hidden;
-            overscroll-behavior: none;
-        }
-
-        /* ===== Animated gradient background ===== */
+        * { font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+        html, body { width: 100%; overflow-x: hidden; overscroll-behavior: none; }
         body {
             background: linear-gradient(-45deg, #000000, #1a1a2e, #16213e, #0f3460, #000000);
             background-size: 400% 400%;
@@ -43,182 +31,64 @@
             justify-content: center;
             padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
-
         @keyframes gradientShift {
             0%   { background-position: 0% 50%; }
             50%  { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-
-        /* ===== Floating orbs ===== */
-        .orb {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.5;
-            animation: float 8s ease-in-out infinite;
-            pointer-events: none;
-            z-index: 0;
-            will-change: transform;
-        }
-
-        .orb-1 {
-            width: 60vmin; height: 60vmin;
-            max-width: 400px; max-height: 400px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            top: -20vmin; left: -20vmin;
-        }
-
-        .orb-2 {
-            width: 55vmin; height: 55vmin;
-            max-width: 350px; max-height: 350px;
-            background: linear-gradient(135deg, #f093fb, #f5576c);
-            bottom: -20vmin; right: -20vmin;
-            animation-delay: 2s;
-        }
-
-        .orb-3 {
-            width: 45vmin; height: 45vmin;
-            max-width: 300px; max-height: 300px;
-            background: linear-gradient(135deg, #4facfe, #00f2fe);
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            animation-delay: 4s;
-        }
-
+        .orb { position: fixed; border-radius: 50%; filter: blur(80px); opacity: 0.5; animation: float 8s ease-in-out infinite; pointer-events: none; z-index: 0; will-change: transform; }
+        .orb-1 { width: 60vmin; height: 60vmin; max-width: 400px; max-height: 400px; background: linear-gradient(135deg, #667eea, #764ba2); top: -20vmin; left: -20vmin; }
+        .orb-2 { width: 55vmin; height: 55vmin; max-width: 350px; max-height: 350px; background: linear-gradient(135deg, #f093fb, #f5576c); bottom: -20vmin; right: -20vmin; animation-delay: 2s; }
+        .orb-3 { width: 45vmin; height: 45vmin; max-width: 300px; max-height: 300px; background: linear-gradient(135deg, #4facfe, #00f2fe); top: 50%; left: 50%; transform: translate(-50%, -50%); animation-delay: 4s; }
         @keyframes float {
             0%, 100% { transform: translate(0, 0) scale(1); }
             33%      { transform: translate(30px, -30px) scale(1.1); }
             66%      { transform: translate(-30px, 30px) scale(0.95); }
         }
-
-        /* ===== Login Card ===== */
         .login-card {
             animation: cardEntrance 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             background: rgba(20, 20, 30, 0.75);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow:
-                0 25px 50px -12px rgba(0, 0, 0, 0.8),
-                0 0 80px rgba(102, 126, 234, 0.15),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 80px rgba(102, 126, 234, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
             width: 100%;
             max-width: 28rem;
             position: relative;
             z-index: 10;
         }
-
         @keyframes cardEntrance {
-            0% {
-                opacity: 0;
-                transform: translateY(60px) scale(0.9) rotateX(-15deg);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0) scale(1) rotateX(0);
-            }
+            0% { opacity: 0; transform: translateY(60px) scale(0.9) rotateX(-15deg); }
+            100% { opacity: 1; transform: translateY(0) scale(1) rotateX(0); }
         }
-
-        /* ===== Logo pulse ===== */
-        .logo-icon {
-            animation: logoPulse 2.5s ease-in-out infinite;
-        }
-
+        .logo-icon { animation: logoPulse 2.5s ease-in-out infinite; }
         @keyframes logoPulse {
-            0%, 100% {
-                transform: scale(1);
-                box-shadow: 0 0 30px rgba(102, 126, 234, 0.5);
-            }
-            50% {
-                transform: scale(1.08);
-                box-shadow: 0 0 50px rgba(102, 126, 234, 0.8);
-            }
+            0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(102, 126, 234, 0.5); }
+            50% { transform: scale(1.08); box-shadow: 0 0 50px rgba(102, 126, 234, 0.8); }
         }
-
-        /* ===== Input fields ===== */
-        .input-field {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 16px;
-        }
-
-        .input-field:focus {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: #667eea;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
-            transform: translateY(-2px);
-        }
-
-        .input-field::placeholder {
-            color: rgba(255, 255, 255, 0.35);
-        }
-
-        /* ===== Button ===== */
-        .btn-gradient {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-            background-size: 200% 200%;
-            animation: gradientMove 3s ease infinite;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            min-height: 52px;
-        }
-
-        .btn-gradient:hover {
-            transform: translateY(-2px);
-            box-shadow:
-                0 15px 35px rgba(102, 126, 234, 0.4),
-                0 0 40px rgba(240, 147, 251, 0.3);
-        }
-
-        .btn-gradient:active {
-            transform: translateY(0) scale(0.98);
-        }
-
+        .input-field { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); font-size: 16px; }
+        .input-field:focus { background: rgba(255, 255, 255, 0.08); border-color: #667eea; box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15); transform: translateY(-2px); }
+        .input-field::placeholder { color: rgba(255, 255, 255, 0.35); }
+        .btn-gradient { background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%); background-size: 200% 200%; animation: gradientMove 3s ease infinite; position: relative; overflow: hidden; transition: all 0.3s ease; min-height: 52px; }
+        .btn-gradient:hover { transform: translateY(-2px); box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4), 0 0 40px rgba(240, 147, 251, 0.3); }
+        .btn-gradient:active { transform: translateY(0) scale(0.98); }
         @keyframes gradientMove {
             0%, 100% { background-position: 0% 50%; }
             50%      { background-position: 100% 50%; }
         }
-
-        .btn-gradient::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .btn-gradient:hover::before {
-            left: 100%;
-        }
-
-        /* ===== Fade-in-up ===== */
-        .fade-in-up {
-            opacity: 0;
-            animation: fadeInUp 0.6s ease forwards;
-        }
-
+        .btn-gradient::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent); transition: left 0.5s ease; }
+        .btn-gradient:hover::before { left: 100%; }
+        .fade-in-up { opacity: 0; animation: fadeInUp 0.6s ease forwards; }
         .delay-1 { animation-delay: 0.2s; }
         .delay-2 { animation-delay: 0.35s; }
         .delay-3 { animation-delay: 0.5s; }
         .delay-4 { animation-delay: 0.65s; }
         .delay-5 { animation-delay: 0.8s; }
-
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(20px); }
             to   { opacity: 1; transform: translateY(0); }
         }
-
-        /* ===== Error shake ===== */
-        .error-shake {
-            animation: shake 0.5s ease-in-out;
-        }
-
+        .error-shake { animation: shake 0.5s ease-in-out; }
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             20%      { transform: translateX(-8px); }
@@ -226,61 +96,21 @@
             60%      { transform: translateX(-5px); }
             80%      { transform: translateX(5px); }
         }
-
-        .text-glow {
-            text-shadow: 0 0 20px rgba(102, 126, 234, 0.6),
-                         0 0 40px rgba(240, 147, 251, 0.3);
-        }
-
-        /* ===== Particles ===== */
-        .particle {
-            position: fixed;
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 50%;
-            animation: rise linear infinite;
-            pointer-events: none;
-            z-index: 1;
-        }
-
+        .text-glow { text-shadow: 0 0 20px rgba(102, 126, 234, 0.6), 0 0 40px rgba(240, 147, 251, 0.3); }
+        .particle { position: fixed; background: rgba(255, 255, 255, 0.15); border-radius: 50%; animation: rise linear infinite; pointer-events: none; z-index: 1; }
         @keyframes rise {
-            from {
-                transform: translateY(100vh) scale(0);
-                opacity: 0;
-            }
+            from { transform: translateY(100vh) scale(0); opacity: 0; }
             10% { opacity: 1; }
             90% { opacity: 1; }
-            to {
-                transform: translateY(-100px) scale(1);
-                opacity: 0;
-            }
+            to { transform: translateY(-100px) scale(1); opacity: 0; }
         }
-
-        /* ===== Mobile-specific ===== */
-        @media (max-width: 640px) {
-            .login-card {
-                border-radius: 1.5rem;
-            }
-        }
-
-        /* ===== Landscape on phone ===== */
+        @media (max-width: 640px) { .login-card { border-radius: 1.5rem; } }
         @media (max-height: 500px) and (orientation: landscape) {
-            .login-card {
-                max-width: 90%;
-                padding: 1rem 2rem;
-            }
-            .logo-icon {
-                width: 3rem !important;
-                height: 3rem !important;
-            }
-            .logo-icon svg {
-                width: 1.75rem !important;
-                height: 1.75rem !important;
-            }
+            .login-card { max-width: 90%; padding: 1rem 2rem; }
+            .logo-icon { width: 3rem !important; height: 3rem !important; }
+            .logo-icon svg { width: 1.75rem !important; height: 1.75rem !important; }
         }
-
-        button, a {
-            touch-action: manipulation;
-        }
+        button, a { touch-action: manipulation; }
     </style>
 </head>
 <body>
@@ -310,12 +140,11 @@
                           d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
                 </svg>
             </div>
-            {{-- ✅ System name from settings --}}
             <h1 class="text-2xl sm:text-3xl font-bold text-white text-glow fade-in-up delay-1">
                 {{ $systemName }}
             </h1>
             <p class="text-gray-400 text-xs sm:text-sm mt-2 fade-in-up delay-2">
-                Ingia kwenye mfumo
+                Sign in to your account
             </p>
             @if($systemPhone)
                 <p class="text-gray-500 text-xs mt-1 fade-in-up delay-2">
@@ -324,7 +153,19 @@
             @endif
         </div>
 
-        <!-- Errors -->
+        <!-- ===== SUCCESS MESSAGE ===== -->
+        @if(session('status'))
+            <div class="fade-in-up bg-green-500/10 border border-green-500/30 text-green-300 px-4 py-3 rounded-xl mb-5 text-xs sm:text-sm backdrop-blur-sm">
+                <p class="flex items-center gap-2">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    {{ session('status') }}
+                </p>
+            </div>
+        @endif
+
+        <!-- ===== ERROR MESSAGES ===== -->
         @if ($errors->any())
             <div class="error-shake bg-red-500/10 border border-red-500/30 text-red-300 px-4 py-3 rounded-xl mb-5 text-xs sm:text-sm backdrop-blur-sm">
                 @foreach ($errors->all() as $error)
@@ -338,14 +179,14 @@
             </div>
         @endif
 
-        <!-- Form -->
+        <!-- ===== LOGIN FORM ===== -->
         <form method="POST" action="{{ route('login.attempt') }}" class="space-y-4 sm:space-y-5">
             @csrf
 
             <!-- Username / Email -->
             <div class="fade-in-up delay-3">
                 <label class="block text-xs sm:text-sm font-medium text-gray-300 mb-2">
-                    Username au Email
+                    Username or Email
                 </label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
@@ -357,7 +198,7 @@
                     <input type="text"
                            name="login"
                            value="{{ old('login') }}"
-                           placeholder="username au email"
+                           placeholder="username or email"
                            required
                            autofocus
                            autocomplete="username"
@@ -368,7 +209,14 @@
 
             <!-- Password -->
             <div class="fade-in-up delay-4">
-                <label class="block text-xs sm:text-sm font-medium text-gray-300 mb-2">Password</label>
+                <div class="flex items-center justify-between mb-2">
+                    <label class="block text-xs sm:text-sm font-medium text-gray-300">Password</label>
+                    <a href="#reset-password"
+                       onclick="toggleResetForm()"
+                       class="text-xs text-indigo-400 hover:text-indigo-300 font-medium transition">
+                        Forgot password?
+                    </a>
+                </div>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
                         <svg class="w-4 h-4 sm:w-5 sm:h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -385,7 +233,7 @@
                     <button type="button"
                             onclick="togglePassword()"
                             class="absolute inset-y-0 right-0 pr-3 sm:pr-4 flex items-center text-gray-500 hover:text-gray-300 transition"
-                            aria-label="Onyesha/Ficha password">
+                            aria-label="Show/Hide password">
                         <svg id="eye-icon" class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                   d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -401,7 +249,7 @@
                 <input type="checkbox" name="remember" id="remember"
                        class="w-4 h-4 rounded border-gray-600 bg-gray-800 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-0">
                 <label for="remember" class="ml-2 text-xs sm:text-sm text-gray-400 cursor-pointer select-none">
-                    Nikumbuke
+                    Remember me
                 </label>
             </div>
 
@@ -414,11 +262,55 @@
                             <path stroke-linecap="round" stroke-linejoin="round"
                                   d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
                         </svg>
-                        Ingia
+                        Sign In
                     </span>
                 </button>
             </div>
         </form>
+
+        <!-- ===== RESET PASSWORD FORM (Hidden by default) ===== -->
+        <div id="reset-password-form" class="hidden mt-6 pt-6 border-t border-white/10">
+            <h2 class="text-white text-lg font-bold mb-1">Reset Password</h2>
+            <p class="text-gray-400 text-xs mb-4">
+                Enter your email and we'll send you a new password.
+            </p>
+
+            <form method="POST" action="{{ route('password.email') }}" class="space-y-4">
+                @csrf
+
+                <div>
+                    <label class="block text-xs sm:text-sm font-medium text-gray-300 mb-2">
+                        Email
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
+                            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                        <input type="email"
+                               name="email"
+                               value="{{ old('email') }}"
+                               placeholder="your email"
+                               required
+                               autocomplete="email"
+                               class="input-field w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-3 rounded-xl text-white outline-none">
+                    </div>
+                </div>
+
+                <button type="submit"
+                        class="w-full bg-gradient-to-br from-yellow-600 to-lime-600 hover:from-yellow-700 hover:to-lime-700 text-white font-semibold py-3.5 rounded-xl transition shadow-lg">
+                    Send New Password
+                </button>
+
+                <button type="button"
+                        onclick="toggleResetForm()"
+                        class="w-full text-gray-400 hover:text-white text-sm font-medium transition">
+                    ← Back to login
+                </button>
+            </form>
+        </div>
 
         <!-- Footer -->
         <div class="text-center mt-5 sm:mt-6 fade-in-up delay-5">
@@ -428,7 +320,7 @@
         </div>
     </div>
 
-    <!-- Password toggle -->
+    <!-- Scripts -->
     <script>
         function togglePassword() {
             const passwordInput = document.getElementById('password');
@@ -446,6 +338,11 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                 `;
             }
+        }
+
+        function toggleResetForm() {
+            const form = document.getElementById('reset-password-form');
+            form.classList.toggle('hidden');
         }
     </script>
 
