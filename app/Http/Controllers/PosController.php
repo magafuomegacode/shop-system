@@ -73,7 +73,8 @@ class PosController extends Controller
             ->where('id', $request->store_id)
             ->firstOrFail();
 
-        $query = Product::select('id', 'name', 'sku', 'unit', 'selling_price', 'is_active')
+        // ✅ Ongeza 'size' kwenye select
+        $query = Product::select('id', 'name', 'sku', 'unit', 'size', 'selling_price', 'is_active')
             ->where('is_active', true)
             ->where('store_id', $store->id);
 
@@ -91,12 +92,14 @@ class PosController extends Controller
             ->whereIn('product_id', $productIds)
             ->pluck('quantity', 'product_id');
 
+        // ✅ Ongeza 'size' kwenye map
         $products = $products->map(function ($p) use ($stocks) {
             return [
                 'id'             => $p->id,
                 'name'           => $p->name,
                 'sku'            => $p->sku,
                 'unit'           => $p->unit,
+                'size'           => $p->size !== null ? (float) $p->size : null,
                 'selling_price'  => (float) $p->selling_price,
                 'stock'          => (int) ($stocks[$p->id] ?? 0),
             ];
@@ -251,7 +254,7 @@ class PosController extends Controller
                 ]);
             }
 
-            // ===== Activity Log (wrapped — won't break sale if it fails) =====
+            // ===== Activity Log (wrapped) =====
             try {
                 ActivityLog::log(
                     $user->id, $shopId, $store->id,
@@ -271,7 +274,7 @@ class PosController extends Controller
                 \Log::warning('ActivityLog failed: ' . $e->getMessage());
             }
 
-            // ===== Notification: Sale Made (wrapped) — ✅ FIXED: send() not push() =====
+            // ===== Notification: Sale Made (wrapped) =====
             try {
                 Notification::send(
                     $shopId,
@@ -285,7 +288,7 @@ class PosController extends Controller
                 \Log::warning('Sale notification failed: ' . $e->getMessage());
             }
 
-            // ===== Notification: Low Stock Alerts (wrapped) — ✅ FIXED: send() not push() =====
+            // ===== Notification: Low Stock Alerts (wrapped) =====
             try {
                 foreach ($lineItems as $li) {
                     $stock = Stock::where('store_id', $store->id)
@@ -320,7 +323,6 @@ class PosController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            // Log full error for debugging
             \Log::error('POS Sale failed: ' . $e->getMessage(), [
                 'file'  => $e->getFile(),
                 'line'  => $e->getLine(),

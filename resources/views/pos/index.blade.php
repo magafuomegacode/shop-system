@@ -175,38 +175,10 @@
             const completeBtn = document.getElementById('complete-sale');
             const clearBtn = document.getElementById('clear-cart');
 
-            const elements = {
-                'pos-search': searchInput,
-                'product-grid': productGrid,
-                'cart-items': cartItems,
-                'cart-count': cartCount,
-                'subtotal': subtotalEl,
-                'discount-amount': discountAmountEl,
-                'total': totalEl,
-                'discount-type': discountTypeEl,
-                'discount-value': discountValueEl,
-                'payment-method': paymentEl,
-                'complete-sale': completeBtn,
-                'clear-cart': clearBtn,
-            };
-
-            console.log('🔍 Element check:');
-            let missing = [];
-            for (const [name, el] of Object.entries(elements)) {
-                if (el) {
-                    console.log('  ✅ ' + name);
-                } else {
-                    console.log('  ❌ ' + name + ' — MISSING!');
-                    missing.push(name);
-                }
-            }
-
-            if (missing.length > 0) {
-                console.error('❌ Missing elements:', missing);
+            if (!searchInput || !productGrid) {
+                console.error('❌ Missing critical elements');
                 return;
             }
-
-            console.log('✅ All elements found!');
 
             // === CONFIG ===
             const storeId = {{ $selectedStoreId }};
@@ -234,14 +206,12 @@
                 productGrid.innerHTML = '<p class="col-span-full text-center text-white text-sm py-8">Searching...</p>';
 
                 const url = searchUrl + '?store_id=' + storeId + '&search=' + encodeURIComponent(q);
-                console.log('🔍 Fetching:', url);
 
                 fetch(url, {
                     headers: { 'Accept': 'application/json' }
                 })
                 .then(r => r.json())
                 .then(data => {
-                    console.log('✅ Data:', data);
                     renderProducts(data);
                 })
                 .catch(err => {
@@ -250,9 +220,40 @@
                 });
             }
 
-            function renderProducts(products) {
-                console.log('🎨 Rendering', products.length);
+            // ===== Build size + unit display: "100g", "500ml", "1L", "1.5kg" =====
+            function buildSizeUnitDisplay(size, unit) {
+                if (!size || !unit) {
+                    return '';
+                }
 
+                // Map unit to short label
+                const unitLabels = {
+                    'kg':    'kg',
+                    'g':     'g',
+                    'litre': 'L',
+                    'ml':    'ml',
+                    'metre': 'm',
+                };
+
+                const shortUnit = unitLabels[unit] || unit;
+
+                // Remove trailing zeros (500.00 -> 500, 1.50 -> 1.5)
+                let sizeValue;
+                if (typeof size === 'number') {
+                    sizeValue = size.toString();
+                } else {
+                    sizeValue = String(size);
+                }
+
+                if (sizeValue.indexOf('.') !== -1) {
+                    sizeValue = sizeValue.replace(/\.?0+$/, '');
+                }
+
+                // ✅ Format: SIZE + UNIT (mfano: 100g, 500ml, 1L, 1.5kg)
+                return sizeValue + shortUnit;
+            }
+
+            function renderProducts(products) {
                 if (!products || !products.length) {
                     productGrid.innerHTML = '<p class="col-span-full text-center text-white text-sm py-8">No products found.</p>';
                     return;
@@ -261,10 +262,49 @@
                 let html = '';
                 products.forEach(function (p) {
                     const disabled = p.stock <= 0;
-                    html += '<button type="button" data-id="' + p.id + '" data-name="' + escapeAttr(p.name) + '" data-price="' + p.selling_price + '" data-stock="' + p.stock + '" data-unit="' + escapeAttr(p.unit || '') + '" class="product-btn text-left bg-stone-800/60 border border-stone-600/50 hover:border-lime-400/60 hover:bg-stone-700/60 rounded-xl p-3 transition' + (disabled ? ' opacity-40 cursor-not-allowed' : '') + '" ' + (disabled ? 'disabled' : '') + '>';
-                    html += '<p class="text-white font-semibold text-xs truncate">' + escapeHtml(p.name) + '</p>';
-                    html += '<p class="text-white font-bold text-sm mt-1">TSh ' + formatNumber(p.selling_price) + '</p>';
-                    html += '<p class="text-white text-[10px] mt-1">Stock: ' + p.stock + ' ' + escapeHtml(p.unit || '') + '</p>';
+
+                    // Build size + unit display
+                    const sizeUnitDisplay = buildSizeUnitDisplay(p.size, p.unit);
+
+                    html += '<button type="button" '
+                         + 'data-id="' + p.id + '" '
+                         + 'data-name="' + escapeAttr(p.name) + '" '
+                         + 'data-price="' + p.selling_price + '" '
+                         + 'data-stock="' + p.stock + '" '
+                         + 'data-unit="' + escapeAttr(p.unit || '') + '" '
+                         + 'data-size="' + escapeAttr(p.size || '') + '" '
+                         + 'data-size-unit="' + escapeAttr(sizeUnitDisplay) + '" '
+                         + 'class="product-btn text-left bg-stone-800/60 border border-stone-600/50 hover:border-lime-400/60 hover:bg-stone-700/60 rounded-xl p-3 transition'
+                         + (disabled ? ' opacity-40 cursor-not-allowed' : '') + '" '
+                         + (disabled ? 'disabled' : '') + '>';
+
+                    // Product name
+                    html += '<p class="text-white font-semibold text-xs truncate">'
+                         + escapeHtml(p.name)
+                         + '</p>';
+
+                    // ✅ Size + Unit — LIME (mfano: 100g, 500ml, 1L, 1.5kg)
+                    if (sizeUnitDisplay) {
+                        html += '<p class="text-lime-400 font-bold text-[11px] mt-1">'
+                             + escapeHtml(sizeUnitDisplay)
+                             + '</p>';
+                    } else if (p.unit) {
+                        html += '<p class="text-lime-400 font-bold text-[11px] mt-1">'
+                             + escapeHtml(p.unit)
+                             + '</p>';
+                    }
+
+                    // Price
+                    html += '<p class="text-white font-bold text-sm mt-1">TSh '
+                         + formatNumber(p.selling_price)
+                         + '</p>';
+
+                    // Stock
+                    html += '<p class="text-white/70 text-[10px] mt-1">Stock: '
+                         + p.stock + ' '
+                         + escapeHtml(p.unit || '')
+                         + '</p>';
+
                     html += '</button>';
                 });
 
@@ -277,14 +317,16 @@
                             this.dataset.name,
                             parseFloat(this.dataset.price),
                             parseInt(this.dataset.stock),
-                            this.dataset.unit
+                            this.dataset.unit,
+                            this.dataset.size,
+                            this.dataset.sizeUnit
                         );
                     });
                 });
             }
 
             // === CART ===
-            function addToCart(id, name, price, stock, unit) {
+            function addToCart(id, name, price, stock, unit, size, sizeUnit) {
                 if (cart[id]) {
                     if (cart[id].quantity >= stock) {
                         alert('Only ' + stock + ' available');
@@ -292,7 +334,16 @@
                     }
                     cart[id].quantity += 1;
                 } else {
-                    cart[id] = { id: id, name: name, price: price, quantity: 1, stock: stock, unit: unit };
+                    cart[id] = {
+                        id: id,
+                        name: name,
+                        price: price,
+                        quantity: 1,
+                        stock: stock,
+                        unit: unit,
+                        size: size,
+                        sizeUnit: sizeUnit,
+                    };
                 }
                 renderCart();
             }
@@ -326,9 +377,17 @@
                     let html = '';
                     ids.forEach(function (id) {
                         const item = cart[id];
+
+                        // Name + size (mfano: "Sukari (100g)")
+                        let displayName = escapeHtml(item.name);
+                        if (item.sizeUnit) {
+                            displayName += ' <span class="text-lime-400 font-bold">('
+                                + escapeHtml(item.sizeUnit) + ')</span>';
+                        }
+
                         html += '<div class="flex items-center gap-2 bg-stone-800/60 border border-stone-600/50 rounded-lg p-2">';
                         html += '<div class="flex-1 min-w-0">';
-                        html += '<p class="text-white text-xs font-semibold truncate">' + escapeHtml(item.name) + '</p>';
+                        html += '<p class="text-white text-xs font-semibold truncate">' + displayName + '</p>';
                         html += '<p class="text-white text-[10px]">TSh ' + formatNumber(item.price) + ' × ' + item.quantity + ' = TSh ' + formatNumber(item.price * item.quantity) + '</p>';
                         html += '</div>';
                         html += '<div class="flex items-center gap-1">';
@@ -403,8 +462,6 @@
                     payment_method: paymentEl.value,
                 };
 
-                console.log('📤 Sending payload:', payload);
-
                 fetch(storeUrl, {
                     method: 'POST',
                     headers: {
@@ -421,18 +478,15 @@
                     try {
                         data = JSON.parse(text);
                     } catch (e) {
-                        console.error('❌ Non-JSON response:', text);
-                        throw new Error('Server error (HTTP ' + r.status + '). Check browser console.');
+                        throw new Error('Server error (HTTP ' + r.status + ').');
                     }
 
                     if (!r.ok || !data.success) {
-                        console.error('❌ Sale failed:', r.status, data);
                         throw new Error(data.error || ('HTTP ' + r.status + ' — Sale failed'));
                     }
                     return data;
                 })
                 .then(function (data) {
-                    console.log('✅ Sale success:', data);
                     cart = {};
                     renderCart();
                     searchInput.value = '';
@@ -442,7 +496,6 @@
                     window.open(data.receipt_url, '_blank');
                 })
                 .catch(function (err) {
-                    console.error('❌ Complete sale error:', err);
                     alert('Error: ' + err.message);
                 })
                 .finally(function () {
@@ -474,10 +527,8 @@
             }
 
             renderCart();
-            console.log('✅ POS Ready');
         }
 
-        // === INIT ===
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', init);
         } else {
