@@ -29,13 +29,16 @@
     </div>
 
     {{-- Info banner: username & password are auto-generated --}}
-    <div class="fade-in-up d-2 bg-blue-500/20 border border-blue-500/40 text-blue-200 px-4 py-3 rounded-xl mb-6 text-xs sm:text-sm flex items-start gap-2">
-        <svg class="w-5 h-5 flex-shrink-0 mt-0.5 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+    <div class="fade-in-up d-2 bg-blue-500/30 border-2 border-blue-400/60 text-blue-100 px-4 py-4 rounded-xl mb-6 text-xs sm:text-sm flex items-start gap-3 shadow-lg shadow-blue-500/20">
+        <svg class="w-6 h-6 flex-shrink-0 mt-0.5 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
         </svg>
         <div>
-            <p class="font-semibold text-blue-100">Username & password will be auto-generated</p>
-            <p class="text-blue-200/80 mt-0.5">Username: first 5 letters of name + ID · Password: 5 random digits</p>
+            <p class="font-bold text-blue-50 text-sm">Username & password will be auto-generated</p>
+            <p class="text-blue-100 mt-1 font-medium">
+                Username: <span class="text-white font-semibold">first 5 letters of name + ID</span> ·
+                Password: <span class="text-white font-semibold">5 random digits</span>
+            </p>
         </div>
     </div>
 
