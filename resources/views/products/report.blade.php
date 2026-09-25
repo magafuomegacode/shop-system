@@ -19,37 +19,150 @@
         body {
             background: #f8fafc;
             color: #0f172a;
+            -webkit-font-smoothing: antialiased;
         }
 
+        /* ===== Print Rules ===== */
         @media print {
-            body { background: white; }
+            body { background: white; font-size: 10.5px; }
             .no-print { display: none !important; }
             .print-break { page-break-inside: avoid; }
             .page-break { page-break-before: always; }
-            @page { margin: 1.5cm; size: A4; }
+            .avoid-break { page-break-inside: avoid; }
+            @page { margin: 1.4cm; size: A4; }
+            .report-container { padding: 0 !important; max-width: 100% !important; }
+            .shadow-sm, .shadow-lg, .shadow-2xl { box-shadow: none !important; }
+            .rounded-2xl, .rounded-xl { border-radius: 4px !important; }
         }
 
         .report-container {
-            max-width: 1000px;
+            max-width: 1100px;
             margin: 0 auto;
             padding: 2rem;
         }
 
-        @media print {
-            .report-container { padding: 0; max-width: 100%; }
+        /* ===== Document Header ===== */
+        .doc-header {
+            border-bottom: 3px double #0f172a;
+            padding-bottom: 1rem;
+            margin-bottom: 1.25rem;
         }
 
-        /* Bordered table */
+        .doc-title {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #0f172a;
+            line-height: 1.2;
+        }
+
+        .doc-subtitle {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        .meta-label {
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #94a3b8;
+        }
+
+        .meta-value {
+            font-size: 12px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        /* ===== Summary Cards ===== */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+            margin-top: 1.25rem;
+        }
+
+        @media (max-width: 640px) {
+            .summary-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .summary-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px 14px;
+            background: #fff;
+        }
+
+        .summary-card.indigo { background: #eef2ff; border-color: #c7d2fe; }
+        .summary-card.green  { background: #f0fdf4; border-color: #bbf7d0; }
+        .summary-card.purple { background: #faf5ff; border-color: #e9d5ff; }
+        .summary-card.emerald{ background: #ecfdf5; border-color: #a7f3d0; }
+
+        .summary-label {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #64748b;
+        }
+
+        .summary-value {
+            font-size: 18px;
+            font-weight: 800;
+            color: #0f172a;
+            margin-top: 4px;
+            line-height: 1.1;
+        }
+
+        .summary-value.small { font-size: 15px; }
+
+        /* ===== Store Section ===== */
+        .store-section {
+            margin-bottom: 1rem;
+        }
+
+        .store-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 12px;
+            margin-bottom: 12px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .store-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #0f172a;
+            line-height: 1.2;
+        }
+
+        .store-count {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        /* ===== Bordered Table ===== */
         .bordered-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 12px;
+            font-size: 11px;
         }
 
         .bordered-table th,
         .bordered-table td {
             border: 1px solid #cbd5e1;
-            padding: 6px 8px;
+            padding: 7px 9px;
             vertical-align: middle;
         }
 
@@ -58,21 +171,30 @@
             color: #0f172a;
             font-weight: 700;
             text-transform: uppercase;
-            font-size: 10px;
-            letter-spacing: 0.5px;
+            font-size: 9px;
+            letter-spacing: 0.7px;
+            border-bottom: 2px solid #94a3b8;
         }
 
         .bordered-table tbody tr:nth-child(even) {
             background: #f8fafc;
         }
 
+        .bordered-table tbody tr:hover {
+            background: #f1f5f9;
+        }
+
         .bordered-table tfoot td {
             background: #e2e8f0;
             font-weight: 700;
-            border-top: 2px solid #64748b;
+            border-top: 2px solid #475569;
+            font-size: 11px;
         }
 
+        .mono { font-family: 'SF Mono', 'Consolas', 'Monaco', monospace; }
+
         @media print {
+            .bordered-table { font-size: 10px; }
             .bordered-table th,
             .bordered-table td {
                 border: 1px solid #000 !important;
@@ -88,6 +210,88 @@
                 background: #e5e7eb !important;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
+            }
+            .summary-card {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                border: 1px solid #000 !important;
+            }
+            .summary-card.indigo,
+            .summary-card.green,
+            .summary-card.purple,
+            .summary-card.emerald {
+                background: #f1f5f9 !important;
+            }
+        }
+
+        /* ===== Filters Box ===== */
+        .filters-box {
+            border: 1px solid #e2e8f0;
+            border-left: 3px solid #6366f1;
+            background: #f8fafc;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 11px;
+            margin-top: 1rem;
+        }
+
+        .filters-box .filter-label {
+            font-weight: 700;
+            color: #0f172a;
+            font-size: 10px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .filters-box ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .filters-box li {
+            color: #475569;
+            padding: 1px 0;
+        }
+
+        .filters-box li::before {
+            content: '▸ ';
+            color: #6366f1;
+            font-weight: 700;
+        }
+
+        /* ===== Signature ===== */
+        .signature-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+        }
+
+        .signature-line {
+            border-top: 1px solid #94a3b8;
+            padding-top: 6px;
+            font-size: 10px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== Watermark for print ===== */
+        @media print {
+            .print-watermark {
+                position: fixed;
+                top: 45%;
+                left: 50%;
+                transform: translate(-50%, -50%) rotate(-30deg);
+                font-size: 90px;
+                font-weight: 800;
+                color: rgba(15, 23, 42, 0.04);
+                z-index: -1;
+                pointer-events: none;
+                letter-spacing: 8px;
             }
         }
     </style>
@@ -112,69 +316,77 @@
         </a>
     </div>
 
+    {{-- Print watermark --}}
+    <div class="print-watermark hidden print:block">{{ strtoupper($systemName) }}</div>
+
     <div class="report-container">
 
-        {{-- Header --}}
+        {{-- ===== Document Header ===== --}}
         <div class="bg-white rounded-2xl p-8 mb-6 shadow-sm">
-            <div class="flex items-start justify-between gap-4 pb-6 border-b border-slate-200">
+            <div class="doc-header flex items-start justify-between gap-4">
                 <div>
-                    <h1 class="text-3xl font-bold text-slate-900">
-                        {{ strtoupper($systemName) }}
-                    </h1>
-                    <p class="text-slate-500 text-sm mt-1">Products Report</p>
+                    <h1 class="doc-title">{{ strtoupper($systemName) }}</h1>
+                    <p class="doc-subtitle">Products Report</p>
                     @if($systemAddress)
-                        <p class="text-slate-500 text-xs mt-0.5">{{ $systemAddress }}</p>
+                        <p class="text-slate-500 text-xs mt-2">{{ $systemAddress }}</p>
                     @endif
                     @if($systemPhone)
                         <p class="text-slate-500 text-xs">Tel: {{ $systemPhone }}</p>
                     @endif
                 </div>
                 <div class="text-right">
-                    <p class="text-slate-500 text-xs uppercase tracking-wide">Generated</p>
-                    <p class="text-slate-900 font-semibold text-sm">
-                        {{ $generatedAt->format('d M Y, H:i') }}
-                    </p>
-                    <p class="text-slate-500 text-xs mt-2">By</p>
-                    <p class="text-slate-900 font-semibold text-sm">
-                        {{ $generatedBy->full_name }}
-                    </p>
+                    <p class="meta-label">Generated</p>
+                    <p class="meta-value">{{ $generatedAt->format('d M Y, H:i') }}</p>
+                    <p class="meta-label mt-3">Generated By</p>
+                    <p class="meta-value">{{ $generatedBy->full_name }}</p>
                     <p class="text-slate-500 text-xs capitalize">{{ $generatedBy->role }}</p>
+                    <p class="meta-label mt-3">Report Ref</p>
+                    <p class="meta-value mono text-xs">PR-{{ $generatedAt->format('Ymd-His') }}</p>
                 </div>
             </div>
 
+            {{-- Filter info (optional, if passed) --}}
+            @if(request('store') || request('search'))
+                <div class="filters-box">
+                    <div class="filter-label">Applied Filters</div>
+                    <ul>
+                        @if(request('store'))
+                            <li>Store filter applied</li>
+                        @endif
+                        @if(request('search'))
+                            <li>Search: <strong>"{{ request('search') }}"</strong></li>
+                        @endif
+                    </ul>
+                </div>
+            @endif
+
             {{-- Summary --}}
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6">
-                <div class="bg-indigo-50 rounded-xl p-4">
-                    <p class="text-slate-500 text-xs">Total Products</p>
-                    <p class="text-slate-900 font-bold text-2xl mt-1">{{ $totals['count'] }}</p>
+            <div class="summary-grid">
+                <div class="summary-card indigo">
+                    <p class="summary-label">Total Products</p>
+                    <p class="summary-value">{{ $totals['count'] }}</p>
                 </div>
-                <div class="bg-green-50 rounded-xl p-4">
-                    <p class="text-slate-500 text-xs">Avg. Selling Price</p>
-                    <p class="text-slate-900 font-bold text-lg mt-1">
-                        {{ $currency }} {{ number_format($totals['avg_selling'], 0) }}
-                    </p>
+                <div class="summary-card green">
+                    <p class="summary-label">Avg. Selling Price</p>
+                    <p class="summary-value small">{{ $currency }} {{ number_format($totals['avg_selling'], 0) }}</p>
                 </div>
-                <div class="bg-purple-50 rounded-xl p-4">
-                    <p class="text-slate-500 text-xs">Total Cost Value</p>
-                    <p class="text-slate-900 font-bold text-lg mt-1">
-                        {{ $currency }} {{ number_format($totals['total_cost'], 0) }}
-                    </p>
+                <div class="summary-card purple">
+                    <p class="summary-label">Total Cost Value</p>
+                    <p class="summary-value small">{{ $currency }} {{ number_format($totals['total_cost'], 0) }}</p>
                 </div>
-                <div class="bg-emerald-50 rounded-xl p-4">
-                    <p class="text-slate-500 text-xs">Potential Profit</p>
-                    <p class="text-slate-900 font-bold text-lg mt-1">
-                        {{ $currency }} {{ number_format($totals['total_profit'], 0) }}
-                    </p>
+                <div class="summary-card emerald">
+                    <p class="summary-label">Potential Profit</p>
+                    <p class="summary-value small">{{ $currency }} {{ number_format($totals['total_profit'], 0) }}</p>
                 </div>
             </div>
         </div>
 
-        {{-- Products grouped by store --}}
+        {{-- ===== Products grouped by store ===== --}}
         @forelse($grouped as $storeName => $items)
-            <div class="bg-white rounded-2xl p-6 mb-4 shadow-sm print-break">
+            <div class="bg-white rounded-2xl p-6 mb-4 shadow-sm store-section print-break avoid-break">
 
                 {{-- Store header --}}
-                <div class="flex items-center justify-between pb-4 mb-4 border-b-2 border-slate-100">
+                <div class="store-header">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
                             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -183,10 +395,8 @@
                             </svg>
                         </div>
                         <div>
-                            <h2 class="text-slate-900 font-bold text-lg">{{ $storeName }}</h2>
-                            <p class="text-slate-500 text-xs">
-                                {{ $items->count() }} {{ Str::plural('product', $items->count()) }}
-                            </p>
+                            <h2 class="store-title">{{ $storeName }}</h2>
+                            <p class="store-count">{{ $items->count() }} {{ Str::plural('product', $items->count()) }}</p>
                         </div>
                     </div>
                 </div>
@@ -230,7 +440,7 @@
                                             <span class="text-[9px] px-1.5 py-0.5 rounded bg-red-100 text-red-700 font-semibold uppercase ml-1">Inactive</span>
                                         @endif
                                     </td>
-                                    <td class="text-slate-600 font-mono text-xs">
+                                    <td class="text-slate-600 mono text-xs">
                                         {{ $product->sku ?? '—' }}
                                     </td>
                                     <td class="text-center text-slate-600">{{ $product->unit ?? '—' }}</td>
@@ -282,10 +492,23 @@
             </div>
         @endforelse
 
-        {{-- Footer --}}
-        <div class="mt-6 text-center text-xs text-slate-400">
+        {{-- ===== Signature Block ===== --}}
+        <div class="signature-row avoid-break">
+            <div>
+                <div class="signature-line">Prepared By</div>
+            </div>
+            <div>
+                <div class="signature-line">Approved By</div>
+            </div>
+        </div>
+
+        {{-- ===== Footer ===== --}}
+        <div class="mt-8 pt-4 border-t border-slate-200 text-center text-xs text-slate-400">
             <p>© {{ date('Y') }} {{ $systemName }} · Products Report</p>
-            <p class="mt-1">{{ $totals['count'] }} products · Generated on {{ $generatedAt->format('d M Y, H:i') }}</p>
+            <p class="mt-1">
+                {{ $totals['count'] }} products · Generated on {{ $generatedAt->format('d M Y, H:i') }}
+                · Ref: PR-{{ $generatedAt->format('Ymd-His') }}
+            </p>
         </div>
 
     </div>
