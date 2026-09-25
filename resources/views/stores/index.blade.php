@@ -5,17 +5,17 @@
 @section('content')
 
     {{-- Header --}}
-    <div class="fade-in-up d-1 bg-gradient-to-br from-stone-800 via-stone-700 to-stone-800 rounded-2xl p-5 mb-6 relative overflow-hidden shadow-2xl border border-stone-600/50">
-        <div class="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-yellow-500/20 to-lime-500/20 rounded-full -mr-20 -mt-20 pointer-events-none"></div>
+    <div class="fade-in-up d-1 bg-gradient-to-br from-blue-950 via-blue-900 to-blue-950 rounded-2xl p-5 mb-6 relative overflow-hidden shadow-2xl border border-blue-700/50">
+        <div class="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full -mr-20 -mt-20 pointer-events-none"></div>
         <div class="relative z-10 flex items-center justify-between gap-4">
             <div>
                 <h2 class="text-white text-xl sm:text-2xl font-bold">Stores</h2>
-                <p class="text-stone-300 text-xs sm:text-sm mt-1">
+                <p class="text-blue-200 text-xs sm:text-sm mt-1">
                     {{ $stores->total() }} {{ Str::plural('store', $stores->total()) }}
                 </p>
             </div>
             <a href="{{ route('stores.create') }}"
-               class="flex-shrink-0 bg-gradient-to-br from-yellow-600 to-lime-600 hover:from-yellow-700 hover:to-lime-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl flex items-center gap-2 transition shadow-lg">
+               class="flex-shrink-0 bg-gradient-to-br from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white text-sm font-semibold px-4 py-2.5 rounded-xl flex items-center gap-2 transition shadow-lg">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                 </svg>
@@ -47,11 +47,11 @@
     @if($stores->count() > 0)
         <div class="space-y-3">
             @foreach($stores as $store)
-                <div class="fade-in-up bg-gradient-to-br from-stone-800 via-stone-700 to-stone-800 rounded-2xl p-4 hover:bg-stone-700/60 transition shadow-2xl border border-stone-600/50">
+                <div class="fade-in-up bg-gradient-to-br from-blue-950 via-blue-900 to-blue-950 rounded-2xl p-4 hover:bg-blue-800/50 transition shadow-2xl border border-blue-700/50">
                     <div class="flex items-center gap-3">
 
                         {{-- Icon --}}
-                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-600 to-lime-600 flex items-center justify-center flex-shrink-0 shadow-lg">
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center flex-shrink-0 shadow-lg">
                             <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                       d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
@@ -68,18 +68,18 @@
                                 @endif
 
                                 @if($store->type)
-                                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-lime-500/20 text-lime-200 border border-lime-500/40 font-semibold uppercase">
+                                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-200 border border-cyan-500/40 font-semibold uppercase">
                                         {{ $store->type }}
                                     </span>
                                 @endif
                             </div>
 
                             @if($store->location)
-                                <p class="text-stone-300 text-xs mt-0.5 truncate">{{ $store->location }}</p>
+                                <p class="text-blue-200 text-xs mt-0.5 truncate">{{ $store->location }}</p>
                             @endif
 
-                            <div class="flex items-center gap-2 text-xs text-stone-300 mt-1">
-                                <span class="px-2 py-0.5 bg-stone-800/60 text-stone-200 border border-stone-600/50 rounded-md font-medium">
+                            <div class="flex items-center gap-2 text-xs text-blue-200 mt-1">
+                                <span class="px-2 py-0.5 bg-blue-900/40 text-blue-100 border border-blue-700/50 rounded-md font-medium">
                                     {{ $store->products_count }} {{ Str::plural('product', $store->products_count) }}
                                 </span>
                             </div>
@@ -88,18 +88,18 @@
                         {{-- Actions --}}
                         <div class="flex items-center gap-1 flex-shrink-0">
                             <a href="{{ route('stores.show', $store) }}"
-                               class="w-8 h-8 rounded-lg bg-stone-800/60 hover:bg-stone-700/60 border border-stone-600/50 flex items-center justify-center transition"
+                               class="w-8 h-8 rounded-lg bg-blue-900/40 hover:bg-blue-800/50 border border-blue-700/50 flex items-center justify-center transition"
                                title="View">
-                                <svg class="w-4 h-4 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <svg class="w-4 h-4 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                 </svg>
                             </a>
 
                             <a href="{{ route('stores.edit', $store) }}"
-                               class="w-8 h-8 rounded-lg bg-stone-800/60 hover:bg-stone-700/60 border border-stone-600/50 flex items-center justify-center transition"
+                               class="w-8 h-8 rounded-lg bg-blue-900/40 hover:bg-blue-800/50 border border-blue-700/50 flex items-center justify-center transition"
                                title="Edit">
-                                <svg class="w-4 h-4 text-lime-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <svg class="w-4 h-4 text-cyan-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                 </svg>
                             </a>
@@ -107,7 +107,7 @@
                             <form method="POST" action="{{ route('stores.toggle-active', $store) }}" class="inline">
                                 @csrf
                                 @method('PATCH')
-                                <button class="w-8 h-8 rounded-lg bg-stone-800/60 hover:bg-stone-700/60 border border-stone-600/50 flex items-center justify-center transition"
+                                <button class="w-8 h-8 rounded-lg bg-blue-900/40 hover:bg-blue-800/50 border border-blue-700/50 flex items-center justify-center transition"
                                         title="{{ $store->is_active ? 'Deactivate' : 'Activate' }}">
                                     @if($store->is_active)
                                         <svg class="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -143,13 +143,13 @@
 
         <div class="mt-6">{{ $stores->links() }}</div>
     @else
-        <div class="bg-gradient-to-br from-stone-800 via-stone-700 to-stone-800 rounded-2xl p-10 text-center shadow-2xl border border-stone-600/50">
-            <svg class="w-16 h-16 text-stone-500/50 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+        <div class="bg-gradient-to-br from-blue-950 via-blue-900 to-blue-950 rounded-2xl p-10 text-center shadow-2xl border border-blue-700/50">
+            <svg class="w-16 h-16 text-blue-500/40 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round"
                       d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
             </svg>
-            <p class="text-stone-200 text-sm font-medium">No stores yet</p>
-            <a href="{{ route('stores.create') }}" class="inline-block mt-4 text-lime-400 hover:text-lime-300 text-sm font-semibold">
+            <p class="text-blue-100 text-sm font-medium">No stores yet</p>
+            <a href="{{ route('stores.create') }}" class="inline-block mt-4 text-cyan-400 hover:text-cyan-300 text-sm font-semibold">
                 Add your first store →
             </a>
         </div>

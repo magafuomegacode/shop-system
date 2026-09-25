@@ -5,16 +5,16 @@
 @section('content')
 
     <a href="{{ route('products.index') }}"
-       class="inline-flex items-center gap-2 text-lime-400 hover:text-lime-300 text-sm mb-4 font-bold">
+       class="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 text-sm mb-4 font-bold">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
         </svg>
         Back to Products
     </a>
 
-    <div class="bg-gradient-to-br from-stone-800 via-stone-700 to-stone-800 rounded-2xl p-6 mb-4 shadow-2xl border border-stone-600/50">
+    <div class="bg-gradient-to-br from-blue-950 via-blue-900 to-blue-950 rounded-2xl p-6 mb-4 shadow-2xl border border-blue-700/50">
         <div class="flex items-center gap-4 mb-6">
-            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-yellow-600 to-lime-600 flex items-center justify-center flex-shrink-0 shadow-lg">
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center flex-shrink-0 shadow-lg">
                 <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round"
                           d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
@@ -22,7 +22,7 @@
             </div>
             <div class="min-w-0">
                 <h2 class="text-white text-xl font-bold truncate">{{ $product->name }}</h2>
-                <p class="text-white text-sm truncate">
+                <p class="text-blue-200 text-sm truncate">
                     @if($product->store) {{ $product->store->name }} · @endif
                     {{ $product->sku ?? 'No SKU' }}
                 </p>
@@ -38,26 +38,26 @@
         @endphp
 
         <div class="grid grid-cols-2 gap-3">
-            <div class="bg-stone-800/60 backdrop-blur rounded-xl p-4 border border-stone-600/50">
-                <p class="text-white text-xs">Selling Price</p>
+            <div class="bg-blue-900/40 backdrop-blur rounded-xl p-4 border border-blue-700/50">
+                <p class="text-blue-200 text-xs">Selling Price</p>
                 <p class="text-white font-bold text-lg mt-1">TSh {{ number_format((float) $product->selling_price, 0) }}</p>
             </div>
-            <div class="bg-stone-800/60 backdrop-blur rounded-xl p-4 border border-stone-600/50">
-                <p class="text-white text-xs">Cost Price</p>
+            <div class="bg-blue-900/40 backdrop-blur rounded-xl p-4 border border-blue-700/50">
+                <p class="text-blue-200 text-xs">Cost Price</p>
                 <p class="text-white font-bold text-lg mt-1">
                     {{ $product->cost_price ? 'TSh ' . number_format((float) $product->cost_price, 0) : '—' }}
                 </p>
             </div>
-            <div class="bg-stone-800/60 backdrop-blur rounded-xl p-4 border border-stone-600/50">
-                <p class="text-white text-xs">Unit</p>
+            <div class="bg-blue-900/40 backdrop-blur rounded-xl p-4 border border-blue-700/50">
+                <p class="text-blue-200 text-xs">Unit</p>
                 <p class="text-white font-semibold mt-1">{{ $product->unit ?? '—' }}</p>
             </div>
-            <div class="bg-stone-800/60 backdrop-blur rounded-xl p-4 border border-stone-600/50">
-                <p class="text-white text-xs">Size</p>
+            <div class="bg-blue-900/40 backdrop-blur rounded-xl p-4 border border-blue-700/50">
+                <p class="text-blue-200 text-xs">Size</p>
                 <p class="text-white font-bold text-lg mt-1">{{ $sizeDisplay }}</p>
             </div>
-            <div class="bg-stone-800/60 backdrop-blur rounded-xl p-4 border border-stone-600/50 col-span-2">
-                <p class="text-white text-xs">Status</p>
+            <div class="bg-blue-900/40 backdrop-blur rounded-xl p-4 border border-blue-700/50 col-span-2">
+                <p class="text-blue-200 text-xs">Status</p>
                 <p class="text-sm mt-1 font-semibold {{ $product->is_active ? 'text-green-400' : 'text-red-400' }}">
                     {{ $product->is_active ? 'Active' : 'Inactive' }}
                 </p>
@@ -65,9 +65,9 @@
         </div>
 
         {{-- Stock Info --}}
-        <div class="mt-6 pt-6 border-t border-stone-600/50">
+        <div class="mt-6 pt-6 border-t border-blue-700/50">
             <h3 class="text-white font-semibold mb-3 flex items-center gap-2">
-                <svg class="w-4 h-4 text-lime-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round"
                           d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                 </svg>
@@ -83,18 +83,18 @@
             @endphp
 
             <div class="grid grid-cols-2 gap-3">
-                <div class="bg-stone-800/60 backdrop-blur rounded-xl p-4 border border-stone-600/50">
-                    <p class="text-white text-xs">Quantity in Stock</p>
+                <div class="bg-blue-900/40 backdrop-blur rounded-xl p-4 border border-blue-700/50">
+                    <p class="text-blue-200 text-xs">Quantity in Stock</p>
                     <p class="text-2xl font-bold mt-1
                         {{ $isOutOfStock ? 'text-red-400' : ($isLowStock ? 'text-yellow-400' : 'text-green-400') }}">
                         {{ $stockQty }}
                     </p>
-                    <p class="text-xs text-white/70 mt-1">{{ $product->unit ?? 'pcs' }}</p>
+                    <p class="text-xs text-blue-200/70 mt-1">{{ $product->unit ?? 'pcs' }}</p>
                 </div>
-                <div class="bg-stone-800/60 backdrop-blur rounded-xl p-4 border border-stone-600/50">
-                    <p class="text-white text-xs">Min Alert Level</p>
+                <div class="bg-blue-900/40 backdrop-blur rounded-xl p-4 border border-blue-700/50">
+                    <p class="text-blue-200 text-xs">Min Alert Level</p>
                     <p class="text-2xl font-bold mt-1 text-white">{{ $minQty }}</p>
-                    <p class="text-xs text-white/70 mt-1">Alert when below</p>
+                    <p class="text-xs text-blue-200/70 mt-1">Alert when below</p>
                 </div>
             </div>
 
@@ -135,10 +135,10 @@
 
         {{-- Store Info --}}
         @if($product->store)
-            <div class="mt-6 pt-6 border-t border-stone-600/50">
+            <div class="mt-6 pt-6 border-t border-blue-700/50">
                 <h3 class="text-white font-semibold mb-3">Store</h3>
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-yellow-600 to-lime-600 flex items-center justify-center flex-shrink-0 shadow-lg">
+                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center flex-shrink-0 shadow-lg">
                         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                   d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
@@ -147,7 +147,7 @@
                     <div class="min-w-0">
                         <p class="text-white font-medium text-sm">{{ $product->store->name }}</p>
                         @if($product->store->location)
-                            <p class="text-white text-xs">{{ $product->store->location }}</p>
+                            <p class="text-blue-200 text-xs">{{ $product->store->location }}</p>
                         @endif
                     </div>
                 </div>
@@ -155,15 +155,15 @@
         @endif
 
         {{-- Added By --}}
-        <div class="mt-6 pt-6 border-t border-stone-600/50">
+        <div class="mt-6 pt-6 border-t border-blue-700/50">
             <h3 class="text-white font-semibold mb-3">Added by</h3>
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-yellow-600 to-lime-600 flex items-center justify-center text-white font-bold shadow-lg">
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold shadow-lg">
                     {{ strtoupper(substr($product->creator->full_name ?? 'U', 0, 1)) }}
                 </div>
                 <div>
                     <p class="text-white font-medium text-sm">{{ $product->creator->full_name ?? 'Unknown' }}</p>
-                    <p class="text-white text-xs capitalize">
+                    <p class="text-blue-200 text-xs capitalize">
                         {{ $product->creator->role ?? '' }} ·
                         @if($product->created_at)
                             {{ $product->created_at->format('d M Y, H:i') }}
@@ -178,7 +178,7 @@
     @if(auth()->user()->isAdmin() || auth()->user()->isOwner() || auth()->user()->isCashier())
         <div class="flex gap-3">
             <a href="{{ route('products.edit', $product) }}"
-               class="bg-gradient-to-br from-yellow-600 to-lime-600 hover:from-yellow-700 hover:to-lime-700 text-white px-5 py-3 rounded-xl text-sm font-bold transition shadow-lg flex items-center gap-2">
+               class="bg-gradient-to-br from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white px-5 py-3 rounded-xl text-sm font-bold transition shadow-lg flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                 </svg>

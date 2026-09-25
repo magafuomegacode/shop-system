@@ -5,7 +5,7 @@
 @section('content')
 
     <a href="{{ route('users.index') }}"
-       class="inline-flex items-center gap-2 text-lime-400 hover:text-lime-300 text-sm mb-4 fade-in-up d-1 font-bold">
+       class="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 text-sm mb-4 fade-in-up d-1 font-bold">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
         </svg>
@@ -13,10 +13,10 @@
     </a>
 
     {{-- Profile header --}}
-    <div class="fade-in-up d-1 bg-gradient-to-br from-stone-800 via-stone-700 to-stone-800 rounded-2xl p-6 mb-4 relative overflow-hidden shadow-2xl border border-stone-600/50">
-        <div class="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-yellow-500/20 to-lime-500/20 rounded-full -mr-20 -mt-20 pointer-events-none"></div>
+    <div class="fade-in-up d-1 bg-gradient-to-br from-blue-950 via-blue-900 to-blue-950 rounded-2xl p-6 mb-4 relative overflow-hidden shadow-2xl border border-blue-700/50">
+        <div class="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full -mr-20 -mt-20 pointer-events-none"></div>
         <div class="relative z-10 flex items-center gap-4">
-            <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-yellow-600 to-lime-600 flex items-center justify-center text-white font-bold text-2xl sm:text-3xl flex-shrink-0 shadow-lg">
+            <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-2xl sm:text-3xl flex-shrink-0 shadow-lg">
                 {{ strtoupper(substr($user->full_name, 0, 1)) }}
             </div>
             <div class="min-w-0">
@@ -28,14 +28,14 @@
                     @elseif($user->isOwner())
                         <span class="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/30 text-white border border-blue-400/40 font-semibold uppercase">Owner</span>
                     @else
-                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-lime-500/20 text-white border border-lime-500/40 font-semibold uppercase">Cashier</span>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/20 text-white border border-cyan-500/40 font-semibold uppercase">Cashier</span>
                     @endif
 
                     @if(!$user->is_active)
                         <span class="text-[10px] px-2 py-0.5 rounded-full bg-red-500/30 text-white border border-red-400/40 font-semibold uppercase">Blocked</span>
                     @endif
                 </div>
-                <p class="text-white text-sm mt-1 truncate">
+                <p class="text-blue-200 text-sm mt-1 truncate">
                     @@<span>{{ $user->username }}</span>
                 </p>
             </div>
@@ -64,21 +64,21 @@
     {{-- Info grid --}}
     <div class="fade-in-up d-2 grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
 
-        <div class="bg-gradient-to-br from-stone-800 via-stone-700 to-stone-800 rounded-2xl p-4 shadow-2xl border border-stone-600/50">
+        <div class="bg-gradient-to-br from-blue-950 via-blue-900 to-blue-950 rounded-2xl p-4 shadow-2xl border border-blue-700/50">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-lime-500/20 border border-lime-500/40 flex items-center justify-center flex-shrink-0">
+                <div class="w-10 h-10 rounded-xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center flex-shrink-0">
                     <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"/>
                     </svg>
                 </div>
                 <div class="min-w-0">
-                    <p class="text-white text-xs font-medium">Email</p>
+                    <p class="text-blue-200 text-xs font-medium">Email</p>
                     <p class="text-white text-sm mt-0.5 truncate font-semibold">{{ $user->email ?? '—' }}</p>
                 </div>
             </div>
         </div>
 
-        <div class="bg-gradient-to-br from-stone-800 via-stone-700 to-stone-800 rounded-2xl p-4 shadow-2xl border border-stone-600/50">
+        <div class="bg-gradient-to-br from-blue-950 via-blue-900 to-blue-950 rounded-2xl p-4 shadow-2xl border border-blue-700/50">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-green-500/20 border border-green-500/40 flex items-center justify-center flex-shrink-0">
                     <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -86,14 +86,14 @@
                     </svg>
                 </div>
                 <div class="min-w-0">
-                    <p class="text-white text-xs font-medium">Phone</p>
+                    <p class="text-blue-200 text-xs font-medium">Phone</p>
                     <p class="text-white text-sm mt-0.5 truncate font-semibold">{{ $user->phone ?? '—' }}</p>
                 </div>
             </div>
         </div>
 
         {{-- Store / Access --}}
-        <div class="bg-gradient-to-br from-stone-800 via-stone-700 to-stone-800 rounded-2xl p-4 shadow-2xl border border-stone-600/50">
+        <div class="bg-gradient-to-br from-blue-950 via-blue-900 to-blue-950 rounded-2xl p-4 shadow-2xl border border-blue-700/50">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center flex-shrink-0">
                     <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -101,7 +101,7 @@
                     </svg>
                 </div>
                 <div class="min-w-0">
-                    <p class="text-white text-xs font-medium">
+                    <p class="text-blue-200 text-xs font-medium">
                         @if($user->isCashier())
                             Store Access
                         @else
@@ -121,7 +121,7 @@
             </div>
         </div>
 
-        <div class="bg-gradient-to-br from-stone-800 via-stone-700 to-stone-800 rounded-2xl p-4 shadow-2xl border border-stone-600/50">
+        <div class="bg-gradient-to-br from-blue-950 via-blue-900 to-blue-950 rounded-2xl p-4 shadow-2xl border border-blue-700/50">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl {{ $user->is_active ? 'bg-green-500/20 border border-green-500/40' : 'bg-red-500/20 border border-red-500/40' }} flex items-center justify-center flex-shrink-0">
                     @if($user->is_active)
@@ -135,7 +135,7 @@
                     @endif
                 </div>
                 <div class="min-w-0">
-                    <p class="text-white text-xs font-medium">Status</p>
+                    <p class="text-blue-200 text-xs font-medium">Status</p>
                     <p class="text-sm mt-0.5 {{ $user->is_active ? 'text-green-400' : 'text-red-400' }} font-bold">
                         {{ $user->is_active ? 'Active' : 'Blocked' }}
                     </p>
@@ -146,25 +146,25 @@
     </div>
 
     {{-- Account details --}}
-    <div class="fade-in-up d-3 bg-gradient-to-br from-stone-800 via-stone-700 to-stone-800 rounded-2xl p-5 mb-4 shadow-2xl border border-stone-600/50">
+    <div class="fade-in-up d-3 bg-gradient-to-br from-blue-950 via-blue-900 to-blue-950 rounded-2xl p-5 mb-4 shadow-2xl border border-blue-700/50">
         <h3 class="text-white font-bold mb-4">Account Details</h3>
         <div class="space-y-3">
 
-            <div class="flex items-center justify-between py-2 border-b border-stone-600/50">
-                <span class="text-white text-sm font-medium">Created at</span>
+            <div class="flex items-center justify-between py-2 border-b border-blue-700/50">
+                <span class="text-blue-200 text-sm font-medium">Created at</span>
                 <span class="text-white text-sm font-semibold">{{ $user->created_at->format('d M Y, H:i') }}</span>
             </div>
 
-            <div class="flex items-center justify-between py-2 border-b border-stone-600/50">
-                <span class="text-white text-sm font-medium">Last login</span>
+            <div class="flex items-center justify-between py-2 border-b border-blue-700/50">
+                <span class="text-blue-200 text-sm font-medium">Last login</span>
                 <span class="text-white text-sm font-semibold">
                     {{ $user->last_login ? $user->last_login->format("d M Y") : 'Never' }}
                 </span>
             </div>
 
             @if($user->creator)
-                <div class="flex items-center justify-between py-2 border-b border-stone-600/50">
-                    <span class="text-white text-sm font-medium">Created by</span>
+                <div class="flex items-center justify-between py-2 border-b border-blue-700/50">
+                    <span class="text-blue-200 text-sm font-medium">Created by</span>
                     <span class="text-white text-sm font-semibold">{{ $user->creator->full_name }}</span>
                 </div>
             @endif
@@ -175,7 +175,7 @@
     {{-- Actions --}}
     <div class="fade-in-up d-4 flex flex-wrap gap-3">
         <a href="{{ route('users.edit', $user) }}"
-           class="bg-gradient-to-br from-yellow-600 to-lime-600 hover:from-yellow-700 hover:to-lime-700 text-white px-5 py-3 rounded-xl text-sm font-bold transition shadow-lg flex items-center gap-2">
+           class="bg-gradient-to-br from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white px-5 py-3 rounded-xl text-sm font-bold transition shadow-lg flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
             </svg>
@@ -188,7 +188,7 @@
                 @method('PATCH')
 
                 @if($user->is_active)
-                    {{-- BLOCK BUTTON — RED --}}
+                    {{-- BLOCK BUTTON — YELLOW --}}
                     <button class="bg-yellow-600 hover:bg-yellow-700 text-white px-5 py-3 rounded-xl text-sm font-bold transition shadow-lg flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>

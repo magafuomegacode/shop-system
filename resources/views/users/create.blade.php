@@ -6,7 +6,7 @@
 
     {{-- Back link --}}
     <a href="{{ route('users.index') }}"
-       class="inline-flex items-center gap-2 text-lime-400 hover:text-lime-300 text-sm mb-4 fade-in-up d-1 font-bold">
+       class="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 text-sm mb-4 fade-in-up d-1 font-bold">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
         </svg>
@@ -14,15 +14,15 @@
     </a>
 
     {{-- Header --}}
-    <div class="fade-in-up d-1 bg-gradient-to-br from-stone-800 via-stone-700 to-stone-800 rounded-2xl p-5 mb-6 relative overflow-hidden shadow-2xl border border-stone-600/50">
-        <div class="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-yellow-500/20 to-lime-500/20 rounded-full -mr-20 -mt-20 pointer-events-none"></div>
+    <div class="fade-in-up d-1 bg-gradient-to-br from-blue-950 via-blue-900 to-blue-950 rounded-2xl p-5 mb-6 relative overflow-hidden shadow-2xl border border-blue-700/50">
+        <div class="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full -mr-20 -mt-20 pointer-events-none"></div>
         <div class="relative z-10">
             <h2 class="text-white text-xl sm:text-2xl font-bold">Add New User</h2>
-            <p class="text-white text-xs sm:text-sm mt-1">
+            <p class="text-blue-200 text-xs sm:text-sm mt-1">
                 @if(auth()->user()->isAdmin())
-                    You are creating a new <span class="text-lime-400 font-semibold">Owner</span>
+                    You are creating a new <span class="text-cyan-400 font-semibold">Owner</span>
                 @else
-                    You are creating a new <span class="text-lime-400 font-semibold">Cashier</span>
+                    You are creating a new <span class="text-cyan-400 font-semibold">Cashier</span>
                 @endif
             </p>
         </div>
@@ -36,8 +36,8 @@
         <div>
             <p class="font-bold text-white text-sm">Username & password will be auto-generated</p>
             <p class="text-white mt-1 font-medium">
-                Username: <span class="text-lime-400 font-semibold">first 5 letters of name + ID</span> ·
-                Password: <span class="text-lime-400 font-semibold">5 random digits</span>
+                Username: <span class="text-cyan-400 font-semibold">first 5 letters of name + ID</span> ·
+                Password: <span class="text-cyan-400 font-semibold">5 random digits</span>
             </p>
             <p class="text-blue-200 mt-2 font-semibold flex items-center gap-1">
                 <svg class="w-4 h-4 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -64,14 +64,14 @@
 
     {{-- Form --}}
     <form method="POST" action="{{ route('users.store') }}"
-          class="fade-in-up d-2 bg-gradient-to-br from-stone-800 via-stone-700 to-stone-800 rounded-2xl p-5 sm:p-6 space-y-5 shadow-2xl border border-stone-600/50">
+          class="fade-in-up d-2 bg-gradient-to-br from-blue-950 via-blue-900 to-blue-950 rounded-2xl p-5 sm:p-6 space-y-5 shadow-2xl border border-blue-700/50">
         @csrf
 
         {{-- Role display (read-only) --}}
         <div>
             <label class="block text-xs font-semibold text-white mb-2">Role</label>
-            <div class="flex items-center gap-2 bg-stone-800/60 backdrop-blur border border-stone-600/50 rounded-xl px-4 py-3">
-                <svg class="w-5 h-5 text-lime-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <div class="flex items-center gap-2 bg-blue-900/40 backdrop-blur border border-blue-700/50 rounded-xl px-4 py-3">
+                <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
                 </svg>
                 <span class="text-white text-sm font-semibold capitalize">
@@ -89,8 +89,8 @@
                    value="{{ old('full_name') }}"
                    required
                    placeholder="e.g. Asha Juma"
-                   class="w-full bg-stone-800/60 backdrop-blur border border-stone-600/50 text-white placeholder-stone-400/50 px-4 py-3 rounded-xl outline-none focus:border-lime-400 focus:ring-2 focus:ring-lime-400/30 transition">
-            <p class="text-white/70 text-xs mt-1">
+                   class="w-full bg-blue-900/40 backdrop-blur border border-blue-700/50 text-white placeholder-blue-200/50 px-4 py-3 rounded-xl outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
+            <p class="text-blue-200/70 text-xs mt-1">
                 Username will be generated from this name (first 5 letters)
             </p>
         </div>
@@ -99,14 +99,14 @@
         <div>
             <label for="email" class="block text-xs font-semibold text-white mb-2">
                 Email
-                <span class="text-lime-400 font-normal">(recommended — credentials will be sent here)</span>
+                <span class="text-cyan-400 font-normal">(recommended — credentials will be sent here)</span>
             </label>
             <input type="email" name="email" id="email"
                    value="{{ old('email') }}"
                    placeholder="e.g. asha@shop.co.tz"
-                   class="w-full bg-stone-800/60 backdrop-blur border border-stone-600/50 text-white placeholder-stone-400/50 px-4 py-3 rounded-xl outline-none focus:border-lime-400 focus:ring-2 focus:ring-lime-400/30 transition">
-            <p class="text-white/70 text-xs mt-1 flex items-center gap-1">
-                <svg class="w-3.5 h-3.5 text-lime-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                   class="w-full bg-blue-900/40 backdrop-blur border border-blue-700/50 text-white placeholder-blue-200/50 px-4 py-3 rounded-xl outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
+            <p class="text-blue-200/70 text-xs mt-1 flex items-center gap-1">
+                <svg class="w-3.5 h-3.5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                 </svg>
                 Credentials (username & password) will be sent to this email.
@@ -119,7 +119,7 @@
             <input type="tel" name="phone" id="phone"
                    value="{{ old('phone') }}"
                    placeholder="e.g. 0712345678"
-                   class="w-full bg-stone-800/60 backdrop-blur border border-stone-600/50 text-white placeholder-stone-400/50 px-4 py-3 rounded-xl outline-none focus:border-lime-400 focus:ring-2 focus:ring-lime-400/30 transition">
+                   class="w-full bg-blue-900/40 backdrop-blur border border-blue-700/50 text-white placeholder-blue-200/50 px-4 py-3 rounded-xl outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
         </div>
 
         {{-- Info: Cashier has access to all stores --}}
@@ -138,11 +138,11 @@
         {{-- Buttons --}}
         <div class="flex items-center gap-3 pt-3">
             <button type="submit"
-                    class="flex-1 bg-gradient-to-br from-yellow-600 to-lime-600 hover:from-yellow-700 hover:to-lime-700 text-white font-bold py-3 rounded-xl transition shadow-lg">
+                    class="flex-1 bg-gradient-to-br from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-bold py-3 rounded-xl transition shadow-lg">
                 Create User
             </button>
             <a href="{{ route('users.index') }}"
-               class="px-5 py-3 rounded-xl bg-stone-800/60 hover:bg-stone-700/60 border border-stone-600/50 text-white text-sm font-bold transition">
+               class="px-5 py-3 rounded-xl bg-blue-900/40 hover:bg-blue-800/50 border border-blue-700/50 text-white text-sm font-bold transition">
                 Cancel
             </a>
         </div>

@@ -6,7 +6,7 @@
 
     {{-- Store Picker --}}
     @if(!$selectedStore)
-        <div class="bg-gradient-to-br from-stone-800 via-stone-700 to-stone-800 rounded-2xl p-6 mb-6 shadow-2xl border border-stone-600/50">
+        <div class="bg-gradient-to-br from-blue-950 via-blue-900 to-blue-950 rounded-2xl p-6 mb-6 shadow-2xl border border-blue-700/50">
             <h2 class="text-white text-xl font-bold mb-1">Choose a Store</h2>
             <p class="text-white text-sm mb-4">Select the store you want to sell from</p>
 
@@ -14,8 +14,8 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     @foreach($stores as $store)
                         <a href="{{ route('pos.index', ['store_id' => $store->id]) }}"
-                           class="bg-stone-800/60 backdrop-blur rounded-2xl p-5 hover:bg-stone-700/60 transition flex items-center gap-3 border border-stone-600/50 hover:border-lime-400/60">
-                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-600 to-lime-600 flex items-center justify-center flex-shrink-0 shadow-lg">
+                           class="bg-blue-900/40 backdrop-blur rounded-2xl p-5 hover:bg-blue-800/50 transition flex items-center gap-3 border border-blue-700/50 hover:border-cyan-400/60">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center flex-shrink-0 shadow-lg">
                                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                           d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/>
@@ -23,7 +23,7 @@
                             </div>
                             <div class="text-left">
                                 <p class="text-white font-semibold">{{ $store->name }}</p>
-                                <p class="text-white text-xs">Tap to select</p>
+                                <p class="text-blue-200 text-xs">Tap to select</p>
                             </div>
                         </a>
                     @endforeach
@@ -36,39 +36,39 @@
         </div>
     @else
         {{-- Store header --}}
-        <div class="bg-gradient-to-br from-stone-800 via-stone-700 to-stone-800 rounded-2xl p-4 mb-4 flex items-center justify-between gap-3 shadow-2xl border border-stone-600/50">
+        <div class="bg-gradient-to-br from-blue-950 via-blue-900 to-blue-950 rounded-2xl p-4 mb-4 flex items-center justify-between gap-3 shadow-2xl border border-blue-700/50">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-600 to-lime-600 flex items-center justify-center flex-shrink-0 shadow-lg">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center flex-shrink-0 shadow-lg">
                     <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round"
                               d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/>
                     </svg>
                 </div>
                 <div>
-                    <p class="text-white text-xs">Selling from</p>
+                    <p class="text-blue-200 text-xs">Selling from</p>
                     <p class="text-white font-semibold">{{ $selectedStore->name }}</p>
                 </div>
             </div>
-            <a href="{{ route('pos.index') }}" class="text-white hover:text-lime-200 text-xs font-semibold">Change</a>
+            <a href="{{ route('pos.index') }}" class="text-cyan-300 hover:text-cyan-200 text-xs font-semibold">Change</a>
         </div>
 
         {{-- POS Layout --}}
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {{-- Products --}}
             <div class="lg:col-span-2 space-y-4">
-                <div class="bg-gradient-to-br from-stone-800 via-stone-700 to-stone-800 rounded-2xl p-4 shadow-2xl border border-stone-600/50">
+                <div class="bg-gradient-to-br from-blue-950 via-blue-900 to-blue-950 rounded-2xl p-4 shadow-2xl border border-blue-700/50">
                     <div class="relative">
-                        <svg class="w-5 h-5 text-white absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <svg class="w-5 h-5 text-blue-200 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
                         <input type="text" id="pos-search"
                                placeholder="Search products by name or SKU..."
                                autocomplete="off"
-                               class="w-full bg-stone-800/60 backdrop-blur border border-stone-600/50 text-white placeholder-white/60 pl-10 pr-4 py-3 rounded-xl outline-none text-sm focus:border-lime-400 focus:ring-2 focus:ring-lime-400/30 transition">
+                               class="w-full bg-blue-900/40 backdrop-blur border border-blue-700/50 text-white placeholder-blue-200/60 pl-10 pr-4 py-3 rounded-xl outline-none text-sm focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
                     </div>
                 </div>
 
-                <div class="bg-gradient-to-br from-stone-800 via-stone-700 to-stone-800 rounded-2xl p-4 shadow-2xl border border-stone-600/50">
+                <div class="bg-gradient-to-br from-blue-950 via-blue-900 to-blue-950 rounded-2xl p-4 shadow-2xl border border-blue-700/50">
                     <h3 class="text-white font-semibold mb-3 text-sm">Tap a product to add</h3>
                     <div id="product-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-2">
                         <p class="col-span-full text-center text-white text-sm py-8">
@@ -80,69 +80,69 @@
 
             {{-- Cart --}}
             <div class="lg:col-span-1">
-                <div class="bg-gradient-to-br from-stone-800 via-stone-700 to-stone-800 rounded-2xl p-4 lg:sticky lg:top-20 shadow-2xl border border-stone-600/50">
+                <div class="bg-gradient-to-br from-blue-950 via-blue-900 to-blue-950 rounded-2xl p-4 lg:sticky lg:top-20 shadow-2xl border border-blue-700/50">
                     <h3 class="text-white font-bold mb-3 flex items-center gap-2">
                         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                   d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17"/>
                         </svg>
                         Cart
-                        <span id="cart-count" class="ml-auto text-xs bg-lime-500/20 text-white border border-lime-500/30 px-2 py-0.5 rounded-full font-semibold">0</span>
+                        <span id="cart-count" class="ml-auto text-xs bg-cyan-500/20 text-white border border-cyan-500/30 px-2 py-0.5 rounded-full font-semibold">0</span>
                     </h3>
 
                     <div id="cart-items" class="space-y-2 max-h-64 overflow-y-auto mb-3">
                         <p class="text-center text-white text-sm py-6">Cart is empty</p>
                     </div>
 
-                    <div class="border-t border-stone-600/50 pt-3 mt-3">
-                        <label class="text-white text-xs font-medium mb-1 block">Discount</label>
+                    <div class="border-t border-blue-700/50 pt-3 mt-3">
+                        <label class="text-blue-200 text-xs font-medium mb-1 block">Discount</label>
                         <div class="flex gap-2 mb-2">
-                            <select id="discount-type" class="bg-stone-800/60 border border-stone-600/50 text-white px-2 py-2 rounded-lg text-xs flex-1 outline-none focus:border-lime-400">
-                                <option value="none" class="bg-stone-800 text-white">None</option>
+                            <select id="discount-type" class="bg-blue-900/40 border border-blue-700/50 text-white px-2 py-2 rounded-lg text-xs flex-1 outline-none focus:border-cyan-400">
+                                <option value="none" class="bg-blue-950 text-white">None</option>
                                 @if($discountAllowed)
-                                    <option value="percent" class="bg-stone-800 text-white">Percent (%)</option>
-                                    <option value="amount" class="bg-stone-800 text-white">Amount (TSh)</option>
+                                    <option value="percent" class="bg-blue-950 text-white">Percent (%)</option>
+                                    <option value="amount" class="bg-blue-950 text-white">Amount (TSh)</option>
                                 @endif
                             </select>
                             <input type="number" id="discount-value" value="0" min="0" step="0.01"
-                                   class="bg-stone-800/60 border border-stone-600/50 text-white px-2 py-2 rounded-lg text-xs w-24 outline-none focus:border-lime-400">
+                                   class="bg-blue-900/40 border border-blue-700/50 text-white px-2 py-2 rounded-lg text-xs w-24 outline-none focus:border-cyan-400">
                         </div>
                         @if($discountAllowed)
-                            <p class="text-white text-[10px]">Max {{ $maxDiscount }}%</p>
+                            <p class="text-blue-200 text-[10px]">Max {{ $maxDiscount }}%</p>
                         @endif
                     </div>
 
-                    <div class="border-t border-stone-600/50 pt-3 mt-3 space-y-1 text-sm">
+                    <div class="border-t border-blue-700/50 pt-3 mt-3 space-y-1 text-sm">
                         <div class="flex justify-between">
-                            <span class="text-white">Subtotal</span>
+                            <span class="text-blue-200">Subtotal</span>
                             <span class="text-white font-medium" id="subtotal">TSh 0</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-white">Discount</span>
+                            <span class="text-blue-200">Discount</span>
                             <span class="text-white font-medium" id="discount-amount">-TSh 0</span>
                         </div>
-                        <div class="flex justify-between text-lg border-t border-stone-600/50 pt-2 mt-2">
+                        <div class="flex justify-between text-lg border-t border-blue-700/50 pt-2 mt-2">
                             <span class="text-white font-bold">Total</span>
                             <span class="text-white font-bold" id="total">TSh 0</span>
                         </div>
                     </div>
 
                     <div class="mt-3">
-                        <label class="text-white text-xs font-medium mb-1 block">Payment</label>
-                        <select id="payment-method" class="bg-stone-800/60 border border-stone-600/50 text-white w-full px-3 py-2 rounded-lg text-sm outline-none focus:border-lime-400">
-                            <option value="cash" class="bg-stone-800 text-white">Cash</option>
-                            <option value="mobile" class="bg-stone-800 text-white">Mobile Money</option>
-                            <option value="card" class="bg-stone-800 text-white">Card</option>
+                        <label class="text-blue-200 text-xs font-medium mb-1 block">Payment</label>
+                        <select id="payment-method" class="bg-blue-900/40 border border-blue-700/50 text-white w-full px-3 py-2 rounded-lg text-sm outline-none focus:border-cyan-400">
+                            <option value="cash" class="bg-blue-950 text-white">Cash</option>
+                            <option value="mobile" class="bg-blue-950 text-white">Mobile Money</option>
+                            <option value="card" class="bg-blue-950 text-white">Card</option>
                         </select>
                     </div>
 
                     <button type="button" id="complete-sale"
-                            class="w-full mt-4 bg-gradient-to-br from-yellow-600 to-lime-600 hover:from-yellow-700 hover:to-lime-700 text-white font-bold py-3 rounded-xl transition shadow-lg disabled:opacity-50">
+                            class="w-full mt-4 bg-gradient-to-br from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-bold py-3 rounded-xl transition shadow-lg disabled:opacity-50">
                         Complete Sale
                     </button>
 
                     <button type="button" id="clear-cart"
-                            class="w-full mt-2 bg-stone-800/60 hover:bg-stone-700/60 border border-stone-600/50 text-white text-xs font-medium py-2 rounded-xl transition">
+                            class="w-full mt-2 bg-blue-900/40 hover:bg-blue-800/50 border border-blue-700/50 text-white text-xs font-medium py-2 rounded-xl transition">
                         Clear Cart
                     </button>
                 </div>
@@ -274,7 +274,7 @@
                          + 'data-unit="' + escapeAttr(p.unit || '') + '" '
                          + 'data-size="' + escapeAttr(p.size || '') + '" '
                          + 'data-size-unit="' + escapeAttr(sizeUnitDisplay) + '" '
-                         + 'class="product-btn text-left bg-stone-800/60 border border-stone-600/50 hover:border-lime-400/60 hover:bg-stone-700/60 rounded-xl p-3 transition'
+                         + 'class="product-btn text-left bg-blue-900/40 border border-blue-700/50 hover:border-cyan-400/60 hover:bg-blue-800/50 rounded-xl p-3 transition'
                          + (disabled ? ' opacity-40 cursor-not-allowed' : '') + '" '
                          + (disabled ? 'disabled' : '') + '>';
 
@@ -283,13 +283,13 @@
                          + escapeHtml(p.name)
                          + '</p>';
 
-                    // ✅ Size + Unit — LIME (mfano: 100g, 500ml, 1L, 1.5kg)
+                    // ✅ Size + Unit — CYAN (mfano: 100g, 500ml, 1L, 1.5kg)
                     if (sizeUnitDisplay) {
-                        html += '<p class="text-lime-400 font-bold text-[11px] mt-1">'
+                        html += '<p class="text-cyan-400 font-bold text-[11px] mt-1">'
                              + escapeHtml(sizeUnitDisplay)
                              + '</p>';
                     } else if (p.unit) {
-                        html += '<p class="text-lime-400 font-bold text-[11px] mt-1">'
+                        html += '<p class="text-cyan-400 font-bold text-[11px] mt-1">'
                              + escapeHtml(p.unit)
                              + '</p>';
                     }
@@ -300,7 +300,7 @@
                          + '</p>';
 
                     // Stock
-                    html += '<p class="text-white/70 text-[10px] mt-1">Stock: '
+                    html += '<p class="text-blue-200/70 text-[10px] mt-1">Stock: '
                          + p.stock + ' '
                          + escapeHtml(p.unit || '')
                          + '</p>';
@@ -381,19 +381,19 @@
                         // Name + size (mfano: "Sukari (100g)")
                         let displayName = escapeHtml(item.name);
                         if (item.sizeUnit) {
-                            displayName += ' <span class="text-lime-400 font-bold">('
+                            displayName += ' <span class="text-cyan-400 font-bold">('
                                 + escapeHtml(item.sizeUnit) + ')</span>';
                         }
 
-                        html += '<div class="flex items-center gap-2 bg-stone-800/60 border border-stone-600/50 rounded-lg p-2">';
+                        html += '<div class="flex items-center gap-2 bg-blue-900/40 border border-blue-700/50 rounded-lg p-2">';
                         html += '<div class="flex-1 min-w-0">';
                         html += '<p class="text-white text-xs font-semibold truncate">' + displayName + '</p>';
-                        html += '<p class="text-white text-[10px]">TSh ' + formatNumber(item.price) + ' × ' + item.quantity + ' = TSh ' + formatNumber(item.price * item.quantity) + '</p>';
+                        html += '<p class="text-blue-200 text-[10px]">TSh ' + formatNumber(item.price) + ' × ' + item.quantity + ' = TSh ' + formatNumber(item.price * item.quantity) + '</p>';
                         html += '</div>';
                         html += '<div class="flex items-center gap-1">';
-                        html += '<button type="button" data-action="dec" data-id="' + id + '" class="cart-btn w-6 h-6 rounded bg-stone-700/60 border border-stone-600/50 hover:bg-stone-600/60 text-white font-bold text-xs">−</button>';
+                        html += '<button type="button" data-action="dec" data-id="' + id + '" class="cart-btn w-6 h-6 rounded bg-blue-800/60 border border-blue-700/50 hover:bg-blue-700/60 text-white font-bold text-xs">−</button>';
                         html += '<span class="text-white font-semibold text-xs w-6 text-center">' + item.quantity + '</span>';
-                        html += '<button type="button" data-action="inc" data-id="' + id + '" class="cart-btn w-6 h-6 rounded bg-stone-700/60 border border-stone-600/50 hover:bg-stone-600/60 text-white font-bold text-xs">+</button>';
+                        html += '<button type="button" data-action="inc" data-id="' + id + '" class="cart-btn w-6 h-6 rounded bg-blue-800/60 border border-blue-700/50 hover:bg-blue-700/60 text-white font-bold text-xs">+</button>';
                         html += '<button type="button" data-action="rm" data-id="' + id + '" class="cart-btn w-6 h-6 rounded bg-red-500/20 border border-red-500/40 hover:bg-red-500/30 text-white text-xs ml-1">×</button>';
                         html += '</div></div>';
                     });
