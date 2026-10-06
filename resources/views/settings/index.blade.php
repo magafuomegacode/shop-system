@@ -5,14 +5,16 @@
 @section('content')
 
     <a href="{{ route('dashboard') }}"
-       class="inline-flex items-center gap-2 text-blue-300 hover:text-white text-sm mb-4 font-medium">
+       class="inline-flex items-center gap-2 text-white hover:text-cyan-300 text-sm mb-4 font-bold">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
         </svg>
         Back to Dashboard
     </a>
 
-    {{-- Header --}}
+    {{-- ========================================================== --}}
+    {{-- HEADER --}}
+    {{-- ========================================================== --}}
     <div class="fade-in-up d-1 bg-gradient-to-br from-blue-950 via-blue-900 to-blue-950 rounded-2xl p-5 mb-6 relative overflow-hidden shadow-2xl border border-blue-700/50">
         <div class="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full -mr-20 -mt-20 pointer-events-none"></div>
         <div class="relative z-10 flex items-center gap-3">
@@ -23,8 +25,8 @@
                 </svg>
             </div>
             <div class="min-w-0">
-                <h2 class="text-white text-xl sm:text-2xl font-bold truncate">System Settings</h2>
-                <p class="text-blue-200 text-xs sm:text-sm mt-0.5">
+                <h2 class="text-white font-bold text-xl sm:text-2xl truncate">System Settings</h2>
+                <p class="text-white font-bold text-xs sm:text-sm mt-0.5 opacity-80">
                     Update your shop name, phone, and other preferences
                 </p>
             </div>
@@ -33,7 +35,7 @@
 
     {{-- Success --}}
     @if(session('success'))
-        <div class="fade-in-up d-2 bg-green-500/20 border border-green-500/40 text-green-200 px-4 py-3 rounded-xl mb-6 text-sm flex items-center gap-2">
+        <div class="fade-in-up d-2 bg-green-500/20 border-2 border-green-500/50 text-white font-bold px-4 py-3 rounded-xl mb-6 text-sm flex items-center gap-2">
             <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
             </svg>
@@ -43,9 +45,9 @@
 
     {{-- Errors --}}
     @if($errors->any())
-        <div class="fade-in-up d-2 bg-red-500/20 border border-red-500/40 text-red-200 px-4 py-3 rounded-xl mb-6 text-sm">
+        <div class="fade-in-up d-2 bg-red-500/20 border-2 border-red-500/50 text-white font-bold px-4 py-3 rounded-xl mb-6 text-sm">
             @foreach($errors->all() as $error)
-                <p class="flex items-center gap-2">
+                <p class="flex items-center gap-2 font-bold">
                     <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
                     </svg>
@@ -60,7 +62,9 @@
         @csrf
         @method('PUT')
 
-        {{-- Section: Shop Identity --}}
+        {{-- ====================================================== --}}
+        {{-- SECTION 1: Shop Identity --}}
+        {{-- ====================================================== --}}
         <div>
             <h3 class="text-white font-bold text-sm mb-4 flex items-center gap-2">
                 <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -71,44 +75,46 @@
 
             <div class="space-y-4">
                 <div>
-                    <label for="system_name" class="block text-xs font-semibold text-blue-200 mb-2">
+                    <label for="system_name" class="block text-xs font-bold text-white mb-2 uppercase tracking-wider">
                         System / Shop Name <span class="text-red-400">*</span>
                     </label>
                     <input type="text" name="system_name" id="system_name"
                            value="{{ old('system_name', $settings['system_name']) }}"
                            required placeholder="e.g. Duka System"
-                           class="w-full bg-blue-900/40 backdrop-blur border border-blue-700/50 text-white placeholder-blue-200/50 px-4 py-3 rounded-xl outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
+                           class="w-full bg-blue-900/60 backdrop-blur border border-blue-700/50 text-white font-bold placeholder-white/40 px-4 py-3 rounded-xl outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label for="phone" class="block text-xs font-semibold text-blue-200 mb-2">Phone Number</label>
+                        <label for="phone" class="block text-xs font-bold text-white mb-2 uppercase tracking-wider">Phone Number</label>
                         <input type="tel" name="phone" id="phone"
                                value="{{ old('phone', $settings['phone']) }}"
                                placeholder="e.g. 0712345678"
-                               class="w-full bg-blue-900/40 backdrop-blur border border-blue-700/50 text-white placeholder-blue-200/50 px-4 py-3 rounded-xl outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
+                               class="w-full bg-blue-900/60 backdrop-blur border border-blue-700/50 text-white font-bold placeholder-white/40 px-4 py-3 rounded-xl outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
                     </div>
 
                     <div>
-                        <label for="email" class="block text-xs font-semibold text-blue-200 mb-2">Email</label>
+                        <label for="email" class="block text-xs font-bold text-white mb-2 uppercase tracking-wider">Email</label>
                         <input type="email" name="email" id="email"
                                value="{{ old('email', $settings['email']) }}"
                                placeholder="e.g. shop@example.co.tz"
-                               class="w-full bg-blue-900/40 backdrop-blur border border-blue-700/50 text-white placeholder-blue-200/50 px-4 py-3 rounded-xl outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
+                               class="w-full bg-blue-900/60 backdrop-blur border border-blue-700/50 text-white font-bold placeholder-white/40 px-4 py-3 rounded-xl outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
                     </div>
                 </div>
 
                 <div>
-                    <label for="address" class="block text-xs font-semibold text-blue-200 mb-2">Address</label>
+                    <label for="address" class="block text-xs font-bold text-white mb-2 uppercase tracking-wider">Address</label>
                     <input type="text" name="address" id="address"
                            value="{{ old('address', $settings['address']) }}"
                            placeholder="e.g. Kariakoo, Dar es Salaam"
-                           class="w-full bg-blue-900/40 backdrop-blur border border-blue-700/50 text-white placeholder-blue-200/50 px-4 py-3 rounded-xl outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
+                           class="w-full bg-blue-900/60 backdrop-blur border border-blue-700/50 text-white font-bold placeholder-white/40 px-4 py-3 rounded-xl outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
                 </div>
             </div>
         </div>
 
-        {{-- Section: Currency --}}
+        {{-- ====================================================== --}}
+        {{-- SECTION 2: Currency --}}
+        {{-- ====================================================== --}}
         <div class="border-t border-blue-700/50 pt-6">
             <h3 class="text-white font-bold text-sm mb-4 flex items-center gap-2">
                 <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -118,18 +124,20 @@
             </h3>
 
             <div>
-                <label for="currency" class="block text-xs font-semibold text-blue-200 mb-2">
+                <label for="currency" class="block text-xs font-bold text-white mb-2 uppercase tracking-wider">
                     Currency Symbol <span class="text-red-400">*</span>
                 </label>
                 <input type="text" name="currency" id="currency"
                        value="{{ old('currency', $settings['currency']) }}"
                        required placeholder="e.g. TSh, KSh, USD"
-                       class="w-full bg-blue-900/40 backdrop-blur border border-blue-700/50 text-white placeholder-blue-200/50 px-4 py-3 rounded-xl outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
-                <p class="text-blue-300/70 text-xs mt-1">Used in all prices across the system</p>
+                       class="w-full bg-blue-900/60 backdrop-blur border border-blue-700/50 text-white font-bold placeholder-white/40 px-4 py-3 rounded-xl outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
+                <p class="text-white font-bold text-xs mt-1 opacity-70">Used in all prices across the system</p>
             </div>
         </div>
 
-        {{-- Section: Receipt --}}
+        {{-- ====================================================== --}}
+        {{-- SECTION 3: Receipt --}}
+        {{-- ====================================================== --}}
         <div class="border-t border-blue-700/50 pt-6">
             <h3 class="text-white font-bold text-sm mb-4 flex items-center gap-2">
                 <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -140,24 +148,26 @@
 
             <div class="space-y-4">
                 <div>
-                    <label for="receipt_header" class="block text-xs font-semibold text-blue-200 mb-2">Receipt Header</label>
+                    <label for="receipt_header" class="block text-xs font-bold text-white mb-2 uppercase tracking-wider">Receipt Header</label>
                     <input type="text" name="receipt_header" id="receipt_header"
                            value="{{ old('receipt_header', $settings['receipt_header']) }}"
                            placeholder="e.g. Asante kwa kununua!"
-                           class="w-full bg-blue-900/40 backdrop-blur border border-blue-700/50 text-white placeholder-blue-200/50 px-4 py-3 rounded-xl outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
+                           class="w-full bg-blue-900/60 backdrop-blur border border-blue-700/50 text-white font-bold placeholder-white/40 px-4 py-3 rounded-xl outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
                 </div>
 
                 <div>
-                    <label for="receipt_footer" class="block text-xs font-semibold text-blue-200 mb-2">Receipt Footer</label>
+                    <label for="receipt_footer" class="block text-xs font-bold text-white mb-2 uppercase tracking-wider">Receipt Footer</label>
                     <input type="text" name="receipt_footer" id="receipt_footer"
                            value="{{ old('receipt_footer', $settings['receipt_footer']) }}"
                            placeholder="e.g. Karibu tena!"
-                           class="w-full bg-blue-900/40 backdrop-blur border border-blue-700/50 text-white placeholder-blue-200/50 px-4 py-3 rounded-xl outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
+                           class="w-full bg-blue-900/60 backdrop-blur border border-blue-700/50 text-white font-bold placeholder-white/40 px-4 py-3 rounded-xl outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
                 </div>
             </div>
         </div>
 
-        {{-- Section: Discount --}}
+        {{-- ====================================================== --}}
+        {{-- SECTION 4: Discount --}}
+        {{-- ====================================================== --}}
         <div class="border-t border-blue-700/50 pt-6">
             <h3 class="text-white font-bold text-sm mb-4 flex items-center gap-2">
                 <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -168,33 +178,43 @@
 
             <div class="space-y-4">
                 <div>
-                    <label for="discount_max_percent" class="block text-xs font-semibold text-blue-200 mb-2">
+                    <label for="discount_max_percent" class="block text-xs font-bold text-white mb-2 uppercase tracking-wider">
                         Max Discount (%)
                     </label>
                     <input type="number" name="discount_max_percent" id="discount_max_percent"
                            value="{{ old('discount_max_percent', $settings['discount_max_percent']) }}"
                            min="0" max="100" step="1" placeholder="20"
-                           class="w-full bg-blue-900/40 backdrop-blur border border-blue-700/50 text-white placeholder-blue-200/50 px-4 py-3 rounded-xl outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
-                    <p class="text-blue-300/70 text-xs mt-1">Cashiers cannot apply discounts above this percentage</p>
+                           class="w-full bg-blue-900/60 backdrop-blur border border-blue-700/50 text-white font-bold placeholder-white/40 px-4 py-3 rounded-xl outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
+                    <p class="text-white font-bold text-xs mt-1 opacity-70">Cashiers cannot apply discounts above this percentage</p>
                 </div>
 
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-3 bg-blue-900/40 border border-blue-700/50 rounded-xl px-4 py-3">
                     <input type="checkbox" name="discount_allowed" id="discount_allowed" value="1"
                            {{ old('discount_allowed', $settings['discount_allowed']) == '1' ? 'checked' : '' }}
-                           class="w-4 h-4 rounded border-blue-700 bg-blue-900/40 text-cyan-500 focus:ring-cyan-400/50">
-                    <label for="discount_allowed" class="text-sm text-blue-100">Allow discounts at POS</label>
+                           class="w-5 h-5 rounded border-blue-700 bg-blue-900/40 text-cyan-500 focus:ring-cyan-400/50">
+                    <label for="discount_allowed" class="text-sm text-white font-bold">
+                        Allow discounts at POS
+                    </label>
                 </div>
             </div>
         </div>
 
-        {{-- Buttons --}}
+        {{-- ====================================================== --}}
+        {{-- BUTTONS --}}
+        {{-- ====================================================== --}}
         <div class="flex items-center gap-3 pt-4 border-t border-blue-700/50">
             <button type="submit"
-                    class="flex-1 bg-gradient-to-br from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold py-3 rounded-xl transition shadow-lg">
+                    class="flex-1 bg-gradient-to-br from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-bold py-3 rounded-xl transition shadow-lg flex items-center justify-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                </svg>
                 Save Settings
             </button>
             <a href="{{ route('dashboard') }}"
-               class="px-5 py-3 rounded-xl bg-blue-900/40 hover:bg-blue-800/50 border border-blue-700/50 text-blue-100 text-sm font-medium transition">
+               class="px-5 py-3 rounded-xl bg-blue-900/40 hover:bg-blue-800/60 border border-blue-700/50 text-white font-bold text-sm transition flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
                 Cancel
             </a>
         </div>
