@@ -345,13 +345,16 @@
                 </div>
             </div>
 
-            {{-- Filter info (optional, if passed) --}}
-            @if(request('store') || request('search'))
+            {{-- Filter info --}}
+            @if(request('store') || request('search') || request('category'))
                 <div class="filters-box">
                     <div class="filter-label">Applied Filters</div>
                     <ul>
                         @if(request('store'))
                             <li>Store filter applied</li>
+                        @endif
+                        @if(request('category'))
+                            <li>Category filter applied</li>
                         @endif
                         @if(request('search'))
                             <li>Search: <strong>"{{ request('search') }}"</strong></li>
@@ -408,13 +411,12 @@
                             <tr>
                                 <th class="text-center w-10">#</th>
                                 <th class="text-left">Product</th>
-                                <th class="text-left w-20">SKU</th>
-                                <th class="text-center w-14">Unit</th>
-                                <th class="text-center w-14">Size</th>
+                                <th class="text-left w-32">Category</th>
+                                <th class="text-left w-40">Specs</th>
                                 <th class="text-center w-16">Stock</th>
                                 <th class="text-right w-20">Cost</th>
                                 <th class="text-right w-24">Selling</th>
-                                <th class="text-right w-24">Added By</th>
+                                <th class="text-right w-28">Added By</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -426,10 +428,14 @@
                                     $minQty = $stock ? (int) $stock->min_quantity : 5;
                                     $isLowStock = $stockQty <= $minQty;
 
-                                    // Size display — remove trailing zeros
-                                    $sizeDisplay = '—';
-                                    if ($product->size !== null && $product->size !== '') {
-                                        $sizeDisplay = rtrim(rtrim(number_format((float) $product->size, 2, '.', ''), '0'), '.');
+                                    // Build specs display
+                                    $specsDisplay = '—';
+                                    if (!empty($product->specs) && is_array($product->specs)) {
+                                        $pairs = [];
+                                        foreach ($product->specs as $k => $v) {
+                                            $pairs[] = ucwords(str_replace('_', ' ', $k)) . ': ' . $v;
+                                        }
+                                        $specsDisplay = implode(' · ', $pairs);
                                     }
                                 @endphp
                                 <tr>
@@ -440,11 +446,12 @@
                                             <span class="text-[9px] px-1.5 py-0.5 rounded bg-red-100 text-red-700 font-semibold uppercase ml-1">Inactive</span>
                                         @endif
                                     </td>
-                                    <td class="text-slate-600 mono text-xs">
-                                        {{ $product->sku ?? '—' }}
+                                    <td class="text-slate-700 text-xs">
+                                        {{ $product->category->name ?? '—' }}
                                     </td>
-                                    <td class="text-center text-slate-600">{{ $product->unit ?? '—' }}</td>
-                                    <td class="text-center font-semibold text-slate-900">{{ $sizeDisplay }}</td>
+                                    <td class="text-slate-600 text-xs">
+                                        {{ $specsDisplay }}
+                                    </td>
                                     <td class="text-center font-semibold {{ $isLowStock ? 'text-red-600' : 'text-slate-900' }}">
                                         {{ $stockQty }}
                                     </td>
@@ -462,7 +469,7 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="5" class="text-left uppercase text-xs tracking-wide">Subtotal</td>
+                                <td colspan="4" class="text-left uppercase text-xs tracking-wide">Subtotal</td>
                                 <td class="text-center">
                                     @php
                                         $storeStockTotal = 0;

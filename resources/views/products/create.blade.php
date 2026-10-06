@@ -4,25 +4,35 @@
 
 @section('content')
 
-    <a href="{{ route('products.index') }}"
+    <a href="{{ url()->previous() }}"
        class="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 text-sm mb-4 fade-in-up d-1 font-bold">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
         </svg>
-        Back to Products
+        Back
     </a>
 
+    {{-- Header --}}
     <div class="fade-in-up d-1 bg-gradient-to-br from-blue-950 via-blue-900 to-blue-950 rounded-2xl p-5 mb-6 relative overflow-hidden shadow-2xl border border-blue-700/50">
         <div class="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full -mr-20 -mt-20 pointer-events-none"></div>
-        <div class="relative z-10">
-            <h2 class="text-white text-xl sm:text-2xl font-bold">Add New Product</h2>
-            <p class="text-blue-200 text-xs sm:text-sm mt-1">
-                You will be recorded as the one who added this product
-            </p>
+        <div class="relative z-10 flex items-start justify-between gap-4">
+            <div>
+                <h2 class="text-white text-xl sm:text-2xl font-bold">Add New Product</h2>
+                <p class="text-blue-200 text-xs sm:text-sm mt-1">
+                    You will be recorded as the one who added this product
+                </p>
+            </div>
+
+            @if($selectedCategoryName)
+                <div class="flex-shrink-0 text-right">
+                    <p class="text-[10px] uppercase font-bold text-cyan-400 tracking-wider">Category</p>
+                    <p class="text-white text-sm font-semibold">{{ $selectedCategoryName }}</p>
+                </div>
+            @endif
         </div>
     </div>
 
-    {{-- ✅ SUCCESS MESSAGE — Kijani yenye nguvu --}}
+    {{-- Success --}}
     <div id="success-message" class="hidden fade-in-up d-2 bg-gradient-to-r from-green-600 to-emerald-600 border-2 border-green-400 text-white px-5 py-4 rounded-xl mb-6 text-sm shadow-2xl shadow-green-500/50 flex items-center gap-3">
         <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
             <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -35,7 +45,7 @@
         </div>
     </div>
 
-    {{-- ❌ ERROR MESSAGE — Nyekundu yenye nguvu --}}
+    {{-- Error --}}
     <div id="error-message" class="hidden fade-in-up d-2 bg-gradient-to-r from-red-600 to-rose-600 border-2 border-red-400 text-white px-5 py-4 rounded-xl mb-6 text-sm shadow-2xl shadow-red-500/50 flex items-center gap-3">
         <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
             <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -48,7 +58,6 @@
         </div>
     </div>
 
-    {{-- Errors (server-side) --}}
     @if($errors->any())
         <div class="fade-in-up d-2 bg-red-500/20 border border-red-500/40 text-white px-4 py-3 rounded-xl mb-6 text-sm">
             @foreach($errors->all() as $error)
@@ -63,10 +72,12 @@
     @endif
 
     <form method="POST" action="{{ route('products.store') }}" id="product-form"
-          class="fade-in-up d-2 bg-gradient-to-br from-blue-950 via-blue-900 to-blue-950 rounded-2xl p-5 sm:p-6 space-y-5 shadow-2xl border border-blue-700/50">
+          class="fade-in-up d-2 bg-gradient-to-br from-blue-950 via-blue-900 to-blue-950 rounded-2xl p-5 sm:p-6 space-y-6 shadow-2xl border border-blue-700/50">
         @csrf
 
-        {{-- Added by --}}
+        {{-- ===================================================== --}}
+        {{-- SECTION 1: Added By --}}
+        {{-- ===================================================== --}}
         <div>
             <label class="block text-xs font-semibold text-white mb-2">Added By</label>
             <div class="flex items-center gap-2 bg-blue-900/40 backdrop-blur border border-blue-700/50 rounded-xl px-4 py-3">
@@ -80,127 +91,207 @@
             </div>
         </div>
 
-        {{-- Name --}}
+        {{-- ===================================================== --}}
+        {{-- SECTION 2: Store & Category context --}}
+        {{-- ===================================================== --}}
         <div>
-            <label for="name" class="block text-xs font-semibold text-white mb-2">
-                Product Name <span class="text-red-400">*</span>
-            </label>
-            <input type="text" name="name" id="name" value="{{ old('name') }}" required
-                   placeholder="e.g. Coca Cola"
-                   class="w-full bg-blue-900/40 border border-blue-700/50 text-white placeholder-blue-200/40 px-4 py-3 rounded-xl outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
+            <h3 class="text-white font-bold text-sm mb-3 flex items-center gap-2">
+                <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M3 7l9-4 9 4M3 7v10l9 4 9-4V7M3 7l9 4m9-4l-9 4m0 0v10"/>
+                </svg>
+                Store &amp; Category
+            </h3>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {{-- Store --}}
+                <div>
+                    <label class="block text-xs font-semibold text-white mb-2">
+                        Store <span class="text-red-400">*</span>
+                    </label>
+
+                    @if(isset($selectedStoreId) && $selectedStoreId)
+                        <div class="flex items-center gap-2 bg-blue-900/40 border border-cyan-500/40 rounded-xl px-4 py-3">
+                            <svg class="w-4 h-4 text-cyan-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                            </svg>
+                            <span class="text-white text-sm font-semibold truncate">
+                                {{ $stores->firstWhere('id', $selectedStoreId)->name ?? 'Selected Store' }}
+                            </span>
+                        </div>
+                        <input type="hidden" name="store_id" id="store_id" value="{{ $selectedStoreId }}">
+                        <p class="text-blue-200/70 text-xs mt-1">🔒 Locked for this flow</p>
+                    @else
+                        <select name="store_id" id="store_id" required
+                                class="w-full bg-blue-900/40 border border-blue-700/50 text-white px-4 py-3 rounded-xl outline-none appearance-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
+                            <option value="" class="bg-blue-950 text-white">-- Select Store --</option>
+                            @foreach($stores as $store)
+                                <option value="{{ $store->id }}" class="bg-blue-950 text-white"
+                                    {{ old('store_id', $selectedStoreId ?? '') == $store->id ? 'selected' : '' }}>
+                                    {{ $store->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    @endif
+                </div>
+
+                {{-- Category --}}
+                <div>
+                    <label class="block text-xs font-semibold text-white mb-2">
+                        Category <span class="text-red-400">*</span>
+                    </label>
+
+                    @if(isset($selectedCategoryId) && $selectedCategoryId)
+                        <div class="flex items-center gap-2 bg-blue-900/40 border border-cyan-500/40 rounded-xl px-4 py-3">
+                            <svg class="w-4 h-4 text-cyan-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                      d="M7 7h.01M7 3h5a2 2 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"/>
+                            </svg>
+                            <span class="text-white text-sm font-semibold truncate">
+                                {{ $selectedCategoryName ?? 'Selected Category' }}
+                            </span>
+                        </div>
+                        <input type="hidden" name="category_id" id="category_id" value="{{ $selectedCategoryId }}">
+                        <p class="text-blue-200/70 text-xs mt-1">🔒 Locked for this flow</p>
+                    @else
+                        <select name="category_id" id="category_id" required
+                                class="w-full bg-blue-900/40 border border-blue-700/50 text-white px-4 py-3 rounded-xl outline-none appearance-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
+                            <option value="" class="bg-blue-950 text-white">-- Select Category --</option>
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}" class="bg-blue-950 text-white"
+                                    {{ old('category_id', $selectedCategoryId ?? '') == $category->id ? 'selected' : '' }}>
+                                    {{ $category->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    @endif
+                </div>
+            </div>
         </div>
 
-        {{-- Store --}}
-        <div>
-            <div class="flex items-center justify-between mb-2">
-                <label for="store_id" class="block text-xs font-semibold text-white">
-                    Store <span class="text-red-400">*</span>
-                </label>
-                <a href="{{ route('stores.create') }}"
-                   class="inline-flex items-center gap-1 text-cyan-400 hover:text-cyan-300 text-xs font-semibold">
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+        {{-- ===================================================== --}}
+        {{-- SECTION 3: Basic info --}}
+        {{-- ===================================================== --}}
+        <div class="border-t border-blue-700/50 pt-5">
+            <h3 class="text-white font-bold text-sm mb-3 flex items-center gap-2">
+                <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Basic Information
+            </h3>
+
+            <div class="space-y-4">
+                <div>
+                    <label for="name" class="block text-xs font-semibold text-white mb-2">
+                        Product Name <span class="text-red-400">*</span>
+                    </label>
+                    <input type="text" name="name" id="name" value="{{ old('name') }}" required
+                           placeholder="e.g. Coca Cola 500ml"
+                           class="w-full bg-blue-900/40 border border-blue-700/50 text-white placeholder-blue-200/40 px-4 py-3 rounded-xl outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
+                </div>
+            </div>
+        </div>
+
+        {{-- ===================================================== --}}
+        {{-- SECTION 4: Category-specific specs --}}
+        {{-- ===================================================== --}}
+        @if(!empty($categorySpecs))
+            <div class="border-t border-blue-700/50 pt-5">
+                <h3 class="text-white font-bold text-sm mb-3 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                     </svg>
-                    New Store
-                </a>
-            </div>
-            <select name="store_id" id="store_id" required
-                    class="w-full bg-blue-900/40 border border-blue-700/50 text-white px-4 py-3 rounded-xl outline-none appearance-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
-                <option value="" class="bg-blue-950 text-white">-- Select Store --</option>
-                @foreach($stores as $store)
-                    <option value="{{ $store->id }}" class="bg-blue-950 text-white" {{ old('store_id') == $store->id ? 'selected' : '' }}>
-                        {{ $store->name }}
-                    </option>
-                @endforeach
-            </select>
-            <p class="text-blue-200/70 text-xs mt-1">Product will be stored in this store</p>
-        </div>
+                    {{ $selectedCategoryName }} Details
+                </h3>
 
-        {{-- SKU + Unit --}}
-        <div class="grid grid-cols-2 gap-3">
-            <div>
-                <label for="sku" class="block text-xs font-semibold text-white mb-2">SKU (optional)</label>
-                <input type="text" name="sku" id="sku" value="{{ old('sku') }}"
-                       placeholder="e.g. CC500"
-                       class="w-full bg-blue-900/40 border border-blue-700/50 text-white placeholder-blue-200/40 px-4 py-3 rounded-xl outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
-            </div>
-            <div>
-                <label for="unit" class="block text-xs font-semibold text-white mb-2">
-                    Unit <span class="text-red-400">*</span>
-                </label>
-                <select name="unit" id="unit" required onchange="toggleSizeInput()"
-                        class="w-full bg-blue-900/40 border border-blue-700/50 text-white px-4 py-3 rounded-xl outline-none appearance-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
-                    <option value="" class="bg-blue-950 text-white" data-size="none">-- Select Unit --</option>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    @foreach($categorySpecs as $spec)
+                        <div class="{{ ($spec['type'] ?? 'text') === 'select' ? 'sm:col-span-2' : '' }}">
+                            <label for="spec_{{ $spec['name'] }}" class="block text-xs font-semibold text-white mb-2">
+                                {{ $spec['label'] }}
+                                @if($spec['required'] ?? false)
+                                    <span class="text-red-400">*</span>
+                                @endif
+                                @if(isset($spec['unit']))
+                                    <span class="text-cyan-400 font-normal">({{ $spec['unit'] }})</span>
+                                @endif
+                            </label>
 
-                    <option value="pcs"    class="bg-blue-950 text-white" data-size="none"  {{ old('unit', 'pcs') == 'pcs' ? 'selected' : '' }}>pcs (pieces)</option>
-                    <option value="kg"     class="bg-blue-950 text-white" data-size="weight" data-label="kg"    {{ old('unit') == 'kg' ? 'selected' : '' }}>kg (kilogram)</option>
-                    <option value="g"      class="bg-blue-950 text-white" data-size="weight" data-label="g"     {{ old('unit') == 'g' ? 'selected' : '' }}>g (gram)</option>
-                    <option value="litre"  class="bg-blue-950 text-white" data-size="volume" data-label="L"     {{ old('unit') == 'litre' ? 'selected' : '' }}>litre</option>
-                    <option value="ml"     class="bg-blue-950 text-white" data-size="volume" data-label="ml"    {{ old('unit') == 'ml' ? 'selected' : '' }}>ml (millilitre)</option>
-                    <option value="box"    class="bg-blue-950 text-white" data-size="none"  {{ old('unit') == 'box' ? 'selected' : '' }}>box</option>
-                    <option value="pack"   class="bg-blue-950 text-white" data-size="none"  {{ old('unit') == 'pack' ? 'selected' : '' }}>pack</option>
-                    <option value="carton" class="bg-blue-950 text-white" data-size="none"  {{ old('unit') == 'carton' ? 'selected' : '' }}>carton</option>
-                    <option value="bottle" class="bg-blue-950 text-white" data-size="none"  {{ old('unit') == 'bottle' ? 'selected' : '' }}>bottle</option>
-                    <option value="can"    class="bg-blue-950 text-white" data-size="none"  {{ old('unit') == 'can' ? 'selected' : '' }}>can</option>
-                    <option value="sachet" class="bg-blue-950 text-white" data-size="none"  {{ old('unit') == 'sachet' ? 'selected' : '' }}>sachet</option>
-                    <option value="dozen"  class="bg-blue-950 text-white" data-size="none"  {{ old('unit') == 'dozen' ? 'selected' : '' }}>dozen</option>
-                    <option value="bundle" class="bg-blue-950 text-white" data-size="none"  {{ old('unit') == 'bundle' ? 'selected' : '' }}>bundle</option>
-                    <option value="bag"    class="bg-blue-950 text-white" data-size="none"  {{ old('unit') == 'bag' ? 'selected' : '' }}>bag</option>
-                    <option value="roll"   class="bg-blue-950 text-white" data-size="none"  {{ old('unit') == 'roll' ? 'selected' : '' }}>roll</option>
-                    <option value="metre"  class="bg-blue-950 text-white" data-size="none"  {{ old('unit') == 'metre' ? 'selected' : '' }}>metre</option>
-                    <option value="pair"   class="bg-blue-950 text-white" data-size="none"  {{ old('unit') == 'pair' ? 'selected' : '' }}>pair</option>
-                    <option value="set"    class="bg-blue-950 text-white" data-size="none"  {{ old('unit') == 'set' ? 'selected' : '' }}>set</option>
-                    <option value="other"  class="bg-blue-950 text-white" data-size="none"  {{ old('unit') == 'other' ? 'selected' : '' }}>Other</option>
-                </select>
+                            @if(($spec['type'] ?? 'text') === 'select')
+                                <select name="specs[{{ $spec['name'] }}]" id="spec_{{ $spec['name'] }}"
+                                        {{ ($spec['required'] ?? false) ? 'required' : '' }}
+                                        class="w-full bg-blue-900/40 border border-blue-700/50 text-white px-4 py-3 rounded-xl outline-none appearance-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
+                                    <option value="" class="bg-blue-950 text-white">-- Select {{ $spec['label'] }} --</option>
+                                    @foreach($spec['options'] ?? [] as $option)
+                                        <option value="{{ $option }}" class="bg-blue-950 text-white"
+                                            {{ old("specs.{$spec['name']}") == $option ? 'selected' : '' }}>
+                                            {{ $option }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            @elseif(($spec['type'] ?? 'text') === 'number')
+                                <input type="number" name="specs[{{ $spec['name'] }}]" id="spec_{{ $spec['name'] }}"
+                                       value="{{ old("specs.{$spec['name']}") }}"
+                                       step="0.01" min="0"
+                                       placeholder="{{ $spec['placeholder'] ?? '0' }}"
+                                       {{ ($spec['required'] ?? false) ? 'required' : '' }}
+                                       class="w-full bg-blue-900/40 border border-blue-700/50 text-white placeholder-blue-200/40 px-4 py-3 rounded-xl outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
+                            @else
+                                <input type="text" name="specs[{{ $spec['name'] }}]" id="spec_{{ $spec['name'] }}"
+                                       value="{{ old("specs.{$spec['name']}") }}"
+                                       placeholder="{{ $spec['placeholder'] ?? '' }}"
+                                       {{ ($spec['required'] ?? false) ? 'required' : '' }}
+                                       class="w-full bg-blue-900/40 border border-blue-700/50 text-white placeholder-blue-200/40 px-4 py-3 rounded-xl outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
             </div>
-        </div>
+        @endif
 
-        {{-- SIZE INPUT (Dynamic) --}}
-        <div id="size-wrapper" class="hidden">
-            <label for="size" class="block text-xs font-semibold text-white mb-2">
-                <span id="size-label">Size</span> <span class="text-red-400">*</span>
-            </label>
-            <div class="flex items-center gap-2">
-                <input type="number" name="size" id="size"
-                       value="{{ old('size') }}"
-                       min="0" step="0.01" placeholder="0"
-                       class="flex-1 bg-blue-900/40 border border-blue-700/50 text-white placeholder-blue-200/40 px-4 py-3 rounded-xl outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
-                <span id="size-unit-display"
-                      class="px-4 py-3 rounded-xl bg-blue-900/40 border border-blue-700/50 text-cyan-400 font-bold text-sm min-w-[60px] text-center">
-                    L
-                </span>
-            </div>
-            <p class="text-blue-200/70 text-xs mt-1">
-                <span id="size-hint">Enter the size (e.g. 1.5 for 1.5L)</span>
-            </p>
-        </div>
+        {{-- ===================================================== --}}
+        {{-- SECTION 5: Pricing --}}
+        {{-- ===================================================== --}}
+        <div class="border-t border-blue-700/50 pt-5">
+            <h3 class="text-white font-bold text-sm mb-3 flex items-center gap-2">
+                <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Pricing
+            </h3>
 
-        {{-- Prices --}}
-        <div class="grid grid-cols-2 gap-3">
-            <div>
-                <label for="cost_price" class="block text-xs font-semibold text-white mb-2">Cost Price (optional)</label>
-                <input type="number" name="cost_price" id="cost_price" value="{{ old('cost_price') }}"
-                       min="0" step="0.01" placeholder="0"
-                       class="w-full bg-blue-900/40 border border-blue-700/50 text-white placeholder-blue-200/40 px-4 py-3 rounded-xl outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
-            </div>
-            <div>
-                <label for="selling_price" class="block text-xs font-semibold text-white mb-2">
-                    Selling Price <span class="text-red-400">*</span>
-                </label>
-                <input type="number" name="selling_price" id="selling_price" value="{{ old('selling_price') }}"
-                       min="0" step="0.01" required placeholder="0"
-                       class="w-full bg-blue-900/40 border border-blue-700/50 text-white placeholder-blue-200/40 px-4 py-3 rounded-xl outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label for="cost_price" class="block text-xs font-semibold text-white mb-2">Cost Price</label>
+                    <input type="number" name="cost_price" id="cost_price" value="{{ old('cost_price') }}"
+                           min="0" step="0.01" placeholder="0"
+                           class="w-full bg-blue-900/40 border border-blue-700/50 text-white placeholder-blue-200/40 px-4 py-3 rounded-xl outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
+                </div>
+                <div>
+                    <label for="selling_price" class="block text-xs font-semibold text-white mb-2">
+                        Selling Price <span class="text-red-400">*</span>
+                    </label>
+                    <input type="number" name="selling_price" id="selling_price" value="{{ old('selling_price') }}"
+                           min="0" step="0.01" required placeholder="0"
+                           class="w-full bg-blue-900/40 border border-blue-700/50 text-white placeholder-blue-200/40 px-4 py-3 rounded-xl outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
+                </div>
             </div>
         </div>
 
-        {{-- Stock Section --}}
-        <div class="border-t border-blue-700/50 pt-5 mt-5">
+        {{-- ===================================================== --}}
+        {{-- SECTION 6: Stock --}}
+        {{-- ===================================================== --}}
+        <div class="border-t border-blue-700/50 pt-5">
             <h3 class="text-white font-bold text-sm mb-3 flex items-center gap-2">
                 <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round"
                           d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                 </svg>
-                Stock Information
+                Stock
             </h3>
 
             <div class="grid grid-cols-2 gap-3">
@@ -212,7 +303,6 @@
                            value="{{ old('quantity', 0) }}"
                            min="0" step="1" required placeholder="0"
                            class="w-full bg-blue-900/40 border border-blue-700/50 text-white placeholder-blue-200/40 px-4 py-3 rounded-xl outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
-                    <p class="text-blue-200/70 text-xs mt-1">How many items are in stock?</p>
                 </div>
                 <div>
                     <label for="min_quantity" class="block text-xs font-semibold text-white mb-2">
@@ -222,7 +312,6 @@
                            value="{{ old('min_quantity', 5) }}"
                            min="0" step="1" placeholder="5"
                            class="w-full bg-blue-900/40 border border-blue-700/50 text-white placeholder-blue-200/40 px-4 py-3 rounded-xl outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
-                    <p class="text-blue-200/70 text-xs mt-1">Alert when stock is below this</p>
                 </div>
             </div>
         </div>
@@ -235,54 +324,19 @@
         </div>
 
         {{-- Buttons --}}
-        <div class="flex items-center gap-3 pt-3">
+        <div class="flex items-center gap-3 pt-3 border-t border-blue-700/50">
             <button type="submit" id="submit-btn"
                     class="flex-1 bg-gradient-to-br from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-bold py-3 rounded-xl transition shadow-lg disabled:opacity-50">
                 <span id="submit-text">Add Product</span>
             </button>
-            <a href="{{ route('products.index') }}"
+            <a href="{{ url()->previous() }}"
                class="px-5 py-3 rounded-xl bg-blue-900/40 hover:bg-blue-800/50 text-white text-sm font-bold transition border border-blue-700/50">
                 Cancel
             </a>
         </div>
     </form>
 
-    {{-- JavaScript: Dynamic Size Input + AJAX Form --}}
     <script>
-        // ===== Size Input Toggle =====
-        function toggleSizeInput() {
-            const unitSelect = document.getElementById('unit');
-            const selectedOption = unitSelect.options[unitSelect.selectedIndex];
-            const sizeType = selectedOption.getAttribute('data-size');
-            const sizeLabel = selectedOption.getAttribute('data-label') || '';
-
-            const sizeWrapper = document.getElementById('size-wrapper');
-            const sizeLabelEl = document.getElementById('size-label');
-            const sizeUnitDisplay = document.getElementById('size-unit-display');
-            const sizeHint = document.getElementById('size-hint');
-            const sizeInput = document.getElementById('size');
-
-            if (sizeType === 'none' || !sizeType) {
-                sizeWrapper.classList.add('hidden');
-                sizeInput.removeAttribute('required');
-                sizeInput.value = '';
-            } else {
-                sizeWrapper.classList.remove('hidden');
-                sizeInput.setAttribute('required', 'required');
-
-                if (sizeType === 'weight') {
-                    sizeLabelEl.textContent = 'Weight';
-                    sizeUnitDisplay.textContent = sizeLabel;
-                    sizeHint.textContent = 'Enter the weight (e.g. 1.5 for 1.5' + sizeLabel + ')';
-                } else if (sizeType === 'volume') {
-                    sizeLabelEl.textContent = 'Volume';
-                    sizeUnitDisplay.textContent = sizeLabel;
-                    sizeHint.textContent = 'Enter the volume (e.g. 1.5 for 1.5' + sizeLabel + ')';
-                }
-            }
-        }
-
-        // ===== AJAX Form Submission =====
         (function () {
             const form = document.getElementById('product-form');
             const submitBtn = document.getElementById('submit-btn');
@@ -298,18 +352,14 @@
                 e.preventDefault();
                 e.stopPropagation();
 
-                // Hide previous messages
                 successMsg.classList.add('hidden');
                 errorMsg.classList.add('hidden');
 
-                // Disable submit button
                 submitBtn.disabled = true;
                 submitText.textContent = 'Adding...';
 
-                // Get form data
                 const formData = new FormData(form);
 
-                // Send via fetch
                 fetch(form.action, {
                     method: 'POST',
                     headers: {
@@ -333,22 +383,21 @@
                     return data;
                 })
                 .then(function (data) {
-                    // Success
                     successText.textContent = data.message || 'Product added successfully!';
                     successMsg.classList.remove('hidden');
 
-                    // Reset form (except store_id)
-                    const storeValue = document.getElementById('store_id').value;
+                    const lockedStore    = document.getElementById('store_id');
+                    const lockedCategory = document.getElementById('category_id');
+                    const storeVal       = lockedStore ? lockedStore.value : '';
+                    const categoryVal    = lockedCategory ? lockedCategory.value : '';
+
                     form.reset();
-                    document.getElementById('store_id').value = storeValue;
 
-                    // Hide size input
-                    document.getElementById('size-wrapper').classList.add('hidden');
+                    if (lockedStore) lockedStore.value = storeVal;
+                    if (lockedCategory) lockedCategory.value = categoryVal;
 
-                    // Scroll to top
                     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-                    // Auto-hide success message after 5 seconds
                     setTimeout(function () {
                         successMsg.classList.add('hidden');
                     }, 5000);
@@ -359,7 +408,6 @@
 
                     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-                    // Auto-hide error after 5 seconds
                     setTimeout(function () {
                         errorMsg.classList.add('hidden');
                     }, 5000);
@@ -370,14 +418,6 @@
                 });
             });
         })();
-
-        // ===== Run on load =====
-        document.addEventListener('DOMContentLoaded', function () {
-            const unitSelect = document.getElementById('unit');
-            if (unitSelect.value) {
-                toggleSizeInput();
-            }
-        });
     </script>
 
 @endsection
