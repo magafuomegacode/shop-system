@@ -110,11 +110,17 @@ Route::middleware('auth')->group(function () {
     */
     Route::middleware('role:admin,owner,cashier')->group(function () {
 
-        // Products — Downloads MUST come before the resource
+        // Products — Downloads & Category Chooser MUST come before the resource
         Route::get('products-download/csv', [ProductController::class, 'downloadCsv'])
             ->name('products.download.csv');
         Route::get('products-download/report', [ProductController::class, 'downloadReport'])
             ->name('products.download.report');
+
+        // 🆕 Category chooser — step 1 of the add-product flow
+        // Must be declared BEFORE Route::resource('products', ...)
+        // otherwise "categories" would be interpreted as a {product} ID.
+        Route::get('products/categories', [ProductController::class, 'chooseCategory'])
+            ->name('products.categories');
 
         // Products resource
         Route::resource('products', ProductController::class);
@@ -127,11 +133,24 @@ Route::middleware('auth')->group(function () {
             Route::get('/receipt/{sale}', [PosController::class, 'receipt'])->name('receipt');
         });
 
-        // Sales — Print & Download MUST come before {sale}
+        // Sales — all specific routes MUST come before {sale}
         Route::prefix('sales')->name('sales.')->group(function () {
             Route::get('/', [SalesController::class, 'index'])->name('index');
             Route::get('/print', [SalesController::class, 'print'])->name('print');
             Route::get('/download/csv', [SalesController::class, 'downloadCsv'])->name('download.csv');
+
+            // ✅ Analytics — dedicated business analysis page
+            Route::get('/analytics', [SalesController::class, 'analytics'])->name('analytics');
+
+            // ✅ Day-by-day chart data (JSON — used on analytics page if needed)
+            Route::get('/daily-chart', [SalesController::class, 'dailyChart'])
+                ->name('daily-chart');
+
+            // ✅ Single-day deep-dive — JSON for the analytics page
+            Route::get('/day-detail', [SalesController::class, 'dayDetail'])
+                ->name('day-detail');
+
+            // Show a single sale — MUST be last so it doesn't swallow the above
             Route::get('/{sale}', [SalesController::class, 'show'])->name('show');
         });
     });

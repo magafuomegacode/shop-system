@@ -47,12 +47,25 @@ class PosController extends Controller
         $maxDiscount = (float) Setting::get($shopId, 'discount_max_percent', 20);
         $discountAllowed = Setting::get($shopId, 'discount_allowed', '1') === '1';
 
+        // ✅ Real-time display data (server-rendered initial values)
+        $now         = now();
+        $todayLabel  = $now->format('l, d M Y');       // e.g. "Monday, 06 Oct 2026"
+        $timeLabel   = $now->format('H:i:s');          // e.g. "14:35:07"
+        $weekNumber  = $now->isoWeek();                // e.g. 41
+        $dayOfYear   = $now->dayOfYear;                // e.g. 279
+        $monthName   = $now->format('F Y');            // e.g. "October 2026"
+
         return view('pos.index', compact(
             'stores',
             'selectedStore',
             'selectedStoreId',
             'maxDiscount',
-            'discountAllowed'
+            'discountAllowed',
+            'todayLabel',
+            'timeLabel',
+            'weekNumber',
+            'dayOfYear',
+            'monthName'
         ));
     }
 
@@ -73,8 +86,7 @@ class PosController extends Controller
             ->where('id', $request->store_id)
             ->firstOrFail();
 
-        // ✅ Ongeza 'size' kwenye select
-        $query = Product::select('id', 'name', 'sku', 'unit', 'size', 'selling_price', 'is_active')
+        $query = Product::select('id', 'name', 'sku', 'unit', 'size', 'specs', 'selling_price', 'is_active')
             ->where('is_active', true)
             ->where('store_id', $store->id);
 
@@ -92,16 +104,16 @@ class PosController extends Controller
             ->whereIn('product_id', $productIds)
             ->pluck('quantity', 'product_id');
 
-        // ✅ Ongeza 'size' kwenye map
         $products = $products->map(function ($p) use ($stocks) {
             return [
-                'id'             => $p->id,
-                'name'           => $p->name,
-                'sku'            => $p->sku,
-                'unit'           => $p->unit,
-                'size'           => $p->size !== null ? (float) $p->size : null,
-                'selling_price'  => (float) $p->selling_price,
-                'stock'          => (int) ($stocks[$p->id] ?? 0),
+                'id'            => $p->id,
+                'name'          => $p->name,
+                'sku'           => $p->sku,
+                'unit'          => $p->unit,
+                'size'          => $p->size !== null ? (float) $p->size : null,
+                'specs'         => $p->specs ?? [],
+                'selling_price' => (float) $p->selling_price,
+                'stock'         => (int) ($stocks[$p->id] ?? 0),
             ];
         });
 
@@ -117,14 +129,14 @@ class PosController extends Controller
         $shopId = $user->shop_id;
 
         $validated = $request->validate([
-            'store_id'        => ['required', 'exists:stores,id'],
-            'items'           => ['required', 'array', 'min:1'],
+            'store_id'           => ['required', 'exists:stores,id'],
+            'items'              => ['required', 'array', 'min:1'],
             'items.*.product_id' => ['required', 'exists:products,id'],
             'items.*.quantity'   => ['required', 'integer', 'min:1'],
-            'discount_type'   => ['nullable', 'in:none,percent,amount'],
-            'discount_value'  => ['nullable', 'numeric', 'min:0'],
-            'payment_method'  => ['required', 'in:cash,mobile,card'],
-            'customer_name'   => ['nullable', 'string', 'max:100'],
+            'discount_type'      => ['nullable', 'in:none,percent,amount'],
+            'discount_value'     => ['nullable', 'numeric', 'min:0'],
+            'payment_method'     => ['required', 'in:cash,mobile,card'],
+            'customer_name'      => ['nullable', 'string', 'max:100'],
         ]);
 
         $store = Store::where('shop_id', $shopId)
@@ -162,7 +174,6 @@ class PosController extends Controller
                 ->get()
                 ->keyBy('id');
 
-            // ===== FIX: Ensure stock records exist for all products =====
             foreach ($productIds as $pid) {
                 Stock::firstOrCreate(
                     ['store_id' => $store->id, 'product_id' => $pid],
@@ -215,7 +226,6 @@ class PosController extends Controller
 
             $invoiceNo = 'INV-' . date('Ymd') . '-' . strtoupper(Str::random(4));
 
-            // ===== Create Sale =====
             $sale = Sale::create([
                 'invoice_no'      => $invoiceNo,
                 'store_id'        => $store->id,
@@ -229,15 +239,14 @@ class PosController extends Controller
                 'customer_name'   => $validated['customer_name'] ?? null,
             ]);
 
-            // ===== Create Sale Items + Update Stock + Log Movements =====
             foreach ($lineItems as $li) {
                 SaleItem::create([
-                    'sale_id'     => $sale->id,
-                    'product_id'  => $li['product_id'],
-                    'quantity'    => $li['quantity'],
-                    'unit_price'  => $li['unit_price'],
-                    'cost_price'  => $li['cost_price'],
-                    'line_total'  => $li['line_total'],
+                    'sale_id'    => $sale->id,
+                    'product_id' => $li['product_id'],
+                    'quantity'   => $li['quantity'],
+                    'unit_price' => $li['unit_price'],
+                    'cost_price' => $li['cost_price'],
+                    'line_total' => $li['line_total'],
                 ]);
 
                 Stock::where('store_id', $store->id)
@@ -254,7 +263,6 @@ class PosController extends Controller
                 ]);
             }
 
-            // ===== Activity Log (wrapped) =====
             try {
                 ActivityLog::log(
                     $user->id, $shopId, $store->id,
@@ -263,18 +271,17 @@ class PosController extends Controller
                     $sale->id, 'sales',
                     null,
                     [
-                        'invoice'    => $invoiceNo,
-                        'subtotal'   => $subtotal,
-                        'discount'   => $discountAmount,
-                        'total'      => $total,
-                        'items'      => count($lineItems),
+                        'invoice'  => $invoiceNo,
+                        'subtotal' => $subtotal,
+                        'discount' => $discountAmount,
+                        'total'    => $total,
+                        'items'    => count($lineItems),
                     ]
                 );
             } catch (\Exception $e) {
                 \Log::warning('ActivityLog failed: ' . $e->getMessage());
             }
 
-            // ===== Notification: Sale Made (wrapped) =====
             try {
                 Notification::send(
                     $shopId,
@@ -288,7 +295,6 @@ class PosController extends Controller
                 \Log::warning('Sale notification failed: ' . $e->getMessage());
             }
 
-            // ===== Notification: Low Stock Alerts (wrapped) =====
             try {
                 foreach ($lineItems as $li) {
                     $stock = Stock::where('store_id', $store->id)
@@ -313,10 +319,10 @@ class PosController extends Controller
             DB::commit();
 
             return response()->json([
-                'success'    => true,
-                'sale_id'    => $sale->id,
-                'invoice_no' => $invoiceNo,
-                'total'      => $total,
+                'success'     => true,
+                'sale_id'     => $sale->id,
+                'invoice_no'  => $invoiceNo,
+                'total'       => $total,
                 'receipt_url' => route('pos.receipt', $sale->id),
             ]);
 
@@ -351,8 +357,8 @@ class PosController extends Controller
 
         $sale->load(['items.product', 'store', 'cashier']);
 
-        $shop = \App\Models\Shop::find($user->shop_id);
-        $currency = Setting::get($user->shop_id, 'currency', 'TSh');
+        $shop          = \App\Models\Shop::find($user->shop_id);
+        $currency      = Setting::get($user->shop_id, 'currency', 'TSh');
         $receiptHeader = Setting::get($user->shop_id, 'receipt_header', 'Asante kwa kununua!');
         $receiptFooter = Setting::get($user->shop_id, 'receipt_footer', '');
 
