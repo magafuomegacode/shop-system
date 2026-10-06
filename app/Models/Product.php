@@ -11,10 +11,12 @@ class Product extends Model
 
     protected $fillable = [
         'store_id',
+        'category_id',   // ✅ NEW
         'name',
         'sku',
         'unit',
-        'size',         // 👈 Ongeza hii
+        'size',
+        'specs',         // ✅ NEW — JSON column
         'cost_price',
         'selling_price',
         'is_active',
@@ -22,7 +24,8 @@ class Product extends Model
     ];
 
     protected $casts = [
-        'size'          => 'decimal:2',  // 👈 Ongeza hii
+        'size'          => 'decimal:2',
+        'specs'         => 'array',          // ✅ auto JSON encode/decode
         'cost_price'    => 'decimal:2',
         'selling_price' => 'decimal:2',
         'is_active'     => 'boolean',
@@ -33,6 +36,14 @@ class Product extends Model
     public function store()
     {
         return $this->belongsTo(Store::class);
+    }
+
+    /**
+     * ✅ NEW — Category this product belongs to.
+     */
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 
     public function creator()

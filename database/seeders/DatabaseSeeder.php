@@ -12,7 +12,8 @@ class DatabaseSeeder extends Seeder
             ShopSeeder::class,        // 1. Create the shop first
             StoreSeeder::class,       // 2. Create default stores (Vinywaji, Losheni)
             AdminSeeder::class,       // 3. Create the Admin user (only this is seeded)
-            SettingSeeder::class,     // 5. Default settings
+            SettingSeeder::class,   
+           StoreAndCategorySeeder::class,  // 5. Default settings
         ]);
     }
 }

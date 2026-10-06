@@ -41,4 +41,12 @@ class Store extends Model
     {
         return $this->hasMany(Sale::class);
     }
+
+    /**
+     * ✅ NEW — Categories that belong to this store.
+     */
+    public function categories()
+    {
+        return $this->hasMany(Category::class);
+    }
 }
