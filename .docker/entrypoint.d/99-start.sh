@@ -7,20 +7,48 @@ echo "=========================================="
 
 cd /var/www/html
 
+# ============================================================
+# 1. Composer
+# ============================================================
 echo "📦 Composer install..."
 composer install --no-dev --optimize-autoloader --no-interaction
 
+# ============================================================
+# 2. Clear caches
+# ============================================================
 echo "🧹 Clearing caches..."
 php artisan config:clear || true
-php artisan route:clear || true
-php artisan view:clear || true
+php artisan route:clear  || true
+php artisan view:clear   || true
 
+# ============================================================
+# 3. Migrations
+# ============================================================
 echo "🗄️  Running migrations..."
-php artisan migrate --force --seed || true
+php artisan migrate --force || true
 
+# ============================================================
+# 4. Seeders (idempotent — safe to run on every deploy)
+# ============================================================
+echo "🌱 Seeding shops (if missing)..."
+php artisan db:seed --class=ShopSeeder --force || true
+
+echo "🌱 Seeding stores and categories..."
+php artisan db:seed --class=StoreAndCategorySeeder --force || true
+
+# ============================================================
+# 5. Cache views / config / routes
+# ============================================================
 echo "🎨 Caching views..."
 php artisan view:cache || true
 
+echo "⚙️  Caching config and routes..."
+php artisan config:cache || true
+php artisan route:cache  || true
+
+# ============================================================
+# 6. Storage + permissions
+# ============================================================
 echo "🔗 Storage link..."
 php artisan storage:link || true
 
@@ -28,7 +56,9 @@ echo "🔒 Permissions..."
 chmod -R 775 storage bootstrap/cache || true
 chown -R www-data:www-data storage bootstrap/cache || true
 
-# ===== DEBUG: Check admin user =====
+# ============================================================
+# 7. Sanity check — user & environment
+# ============================================================
 echo "=========================================="
 echo "🔍 DEBUG: Checking admin user..."
 echo "=========================================="
@@ -53,17 +83,19 @@ echo 'APP_ENV: ' . config('app.env') . PHP_EOL;
 "
 echo "=========================================="
 
-# ===== RESET ADMIN PASSWORD (kama haifanyi kazi) =====
-# ONDOA hii baada ya kutatua tatizo
+# ============================================================
+# 8. Verify stores + categories
+# ============================================================
+echo "📊 Verifying stores and categories..."
 php artisan tinker --execute="
-\$user = \App\Models\User::where('username', 'mkcoder')->first();
-if (\$user) {
-    \$user->password = \Hash::make('mkcoder1234');
-    \$user->is_active = true;
-    \$user->save();
-    echo '✅ Admin password reset to: mkcoder1234' . PHP_EOL;
+\$stores = \App\Models\Store::withCount('categories')->get(['id','name']);
+foreach (\$stores as \$s) {
+    echo '🏬 ' . \$s->name . ' → ' . \$s->categories_count . ' categories' . PHP_EOL;
 }
+echo 'Total stores: ' . \$stores->count() . PHP_EOL;
+echo 'Total categories: ' . \App\Models\Category::count() . PHP_EOL;
 "
+echo "=========================================="
 
 echo "=========================================="
 echo "✅ Deployment complete!"
