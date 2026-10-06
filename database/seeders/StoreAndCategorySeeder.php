@@ -103,6 +103,9 @@ class StoreAndCategorySeeder extends Seeder
 
             $type = ($storeName === 'SCENTS') ? 'scent' : 'decor';
 
+            // ============================================================
+            // Find the store by NAME (matches what you already created online)
+            // ============================================================
             $store = Store::firstOrCreate(
                 [
                     'shop_id' => $shop->id,
@@ -119,15 +122,18 @@ class StoreAndCategorySeeder extends Seeder
                 $storeCount++;
             }
 
-            $this->command->info("🏬 Store: {$store->name}");
+            $this->command->info("🏬 Store: {$store->name} (id={$store->id})");
 
             foreach ($categories as $categoryName) {
 
-                // ✅ categories are global — no shop_id / store_id
-                $category = Category::firstOrCreate(
+                // ✅ CHANGED: updateOrCreate with store_id
+                // - If category exists → sets store_id
+                // - If category is new   → creates it with store_id
+                $category = Category::updateOrCreate(
                     ['name' => $categoryName],
                     [
-                        'description' => "Category for {$storeName}",
+                        'store_id'    => $store->id,
+                        'description' => "Category under {$storeName}",
                         'is_active'   => true,
                     ]
                 );
@@ -141,6 +147,6 @@ class StoreAndCategorySeeder extends Seeder
         }
 
         $this->command->info('');
-        $this->command->info("✅ Done: {$storeCount} stores, {$categoryCount} categories created.");
+        $this->command->info("✅ Done: {$storeCount} new stores, {$categoryCount} new categories.");
     }
 }
