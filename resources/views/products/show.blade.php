@@ -12,6 +12,37 @@
         Back to Products
     </a>
 
+    @php
+        // Resolve unit: product's own unit OR fall back to category config
+        $unitLabel = $product->unit
+            ?? (config("category_specs.{$product->category->name}.unit") ?? null);
+
+        $unitFriendly = [
+            'pcs'   => 'pcs',
+            'set'   => 'set',
+            'pair'  => 'pair',
+            'pack'  => 'pack',
+            'box'   => 'box',
+            'bunch' => 'bunch',
+            'm2'    => 'm²',
+            'm'     => 'm',
+            'kg'    => 'kg',
+            'g'     => 'g',
+            'L'     => 'L',
+            'ml'    => 'ml',
+        ][$unitLabel ?? ''] ?? $unitLabel;
+
+        $unitColors = [
+            'pcs'   => 'bg-blue-500/30 border-blue-400/40',
+            'set'   => 'bg-purple-500/30 border-purple-400/40',
+            'pack'  => 'bg-emerald-500/30 border-emerald-400/40',
+            'box'   => 'bg-amber-500/30 border-amber-400/40',
+            'bunch' => 'bg-pink-500/30 border-pink-400/40',
+            'm2'    => 'bg-cyan-500/30 border-cyan-400/40',
+            'm'     => 'bg-teal-500/30 border-teal-400/40',
+        ][$unitLabel ?? ''] ?? 'bg-slate-500/30 border-slate-400/40';
+    @endphp
+
     <div class="bg-gradient-to-br from-blue-950 via-blue-900 to-blue-950 rounded-2xl p-6 mb-4 shadow-2xl border border-blue-700/50">
         <div class="flex items-center gap-4 mb-6">
             <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center flex-shrink-0 shadow-lg">
@@ -21,8 +52,18 @@
                 </svg>
             </div>
             <div class="min-w-0">
-                <h2 class="text-white font-bold text-xl truncate">{{ $product->name }}</h2>
-                <p class="text-white font-bold text-sm truncate">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <h2 class="text-white font-bold text-xl truncate">{{ $product->name }}</h2>
+
+                    {{-- ✅ UNIT BADGE --}}
+                    @if($unitFriendly)
+                        <span class="inline-block px-2 py-0.5 rounded-md text-[10px] font-bold uppercase border {{ $unitColors }} text-white flex-shrink-0"
+                              title="Sold per {{ $unitFriendly }}">
+                            {{ $unitFriendly }}
+                        </span>
+                    @endif
+                </div>
+                <p class="text-white font-bold text-sm truncate mt-1">
                     @if($product->store) {{ $product->store->name }} @endif
                     @if($product->category) · {{ $product->category->name }} @endif
                 </p>
@@ -33,15 +74,21 @@
             <div class="bg-blue-900/40 backdrop-blur rounded-xl p-4 border border-blue-700/50">
                 <p class="text-white font-bold text-xs">Selling Price</p>
                 <p class="text-white font-bold text-lg mt-1">TSh {{ number_format((float) $product->selling_price, 0) }}</p>
+                @if($unitFriendly)
+                    <p class="text-white font-bold text-[10px] opacity-70 mt-0.5">per {{ $unitFriendly }}</p>
+                @endif
             </div>
             <div class="bg-blue-900/40 backdrop-blur rounded-xl p-4 border border-blue-700/50">
                 <p class="text-white font-bold text-xs">Cost Price</p>
                 <p class="text-white font-bold text-lg mt-1">
                     {{ $product->cost_price ? 'TSh ' . number_format((float) $product->cost_price, 0) : '—' }}
                 </p>
+                @if($unitFriendly && $product->cost_price)
+                    <p class="text-white font-bold text-[10px] opacity-70 mt-0.5">per {{ $unitFriendly }}</p>
+                @endif
             </div>
 
-            {{-- Category (replaces Unit) --}}
+            {{-- Category --}}
             <div class="bg-blue-900/40 backdrop-blur rounded-xl p-4 border border-blue-700/50">
                 <p class="text-white font-bold text-xs">Category</p>
                 @if($product->category)
@@ -54,7 +101,7 @@
                 @endif
             </div>
 
-            {{-- Profit (replaces Size) --}}
+            {{-- Profit --}}
             @php
                 $profit = ($product->selling_price ?? 0) - ($product->cost_price ?? 0);
             @endphp
@@ -63,6 +110,9 @@
                 <p class="font-bold text-lg mt-1 {{ $profit >= 0 ? 'text-green-400' : 'text-red-400' }}">
                     TSh {{ number_format($profit, 0) }}
                 </p>
+                @if($unitFriendly)
+                    <p class="text-white font-bold text-[10px] opacity-70 mt-0.5">per {{ $unitFriendly }}</p>
+                @endif
             </div>
 
             <div class="bg-blue-900/40 backdrop-blur rounded-xl p-4 border border-blue-700/50 col-span-2">
@@ -74,7 +124,7 @@
         </div>
 
         {{-- ========================================================== --}}
-        {{-- CATEGORY SPECS — dynamic fields (Volume, Fragrance, etc.) --}}
+        {{-- CATEGORY SPECS --}}
         {{-- ========================================================== --}}
         @if(!empty($product->specs) && is_array($product->specs))
             <div class="mt-6 pt-6 border-t border-blue-700/50">
@@ -107,6 +157,11 @@
                           d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                 </svg>
                 Stock
+                @if($unitFriendly)
+                    <span class="text-white font-bold text-[10px] px-2 py-0.5 rounded-md bg-cyan-500/30 border border-cyan-400/40 uppercase">
+                        in {{ $unitFriendly }}
+                    </span>
+                @endif
             </h3>
 
             @php
@@ -123,11 +178,19 @@
                     <p class="text-2xl font-bold mt-1
                         {{ $isOutOfStock ? 'text-red-400' : ($isLowStock ? 'text-yellow-400' : 'text-green-400') }}">
                         {{ $stockQty }}
+                        @if($unitFriendly)
+                            <span class="text-sm opacity-70">{{ $unitFriendly }}</span>
+                        @endif
                     </p>
                 </div>
                 <div class="bg-blue-900/40 backdrop-blur rounded-xl p-4 border border-blue-700/50">
                     <p class="text-white font-bold text-xs">Min Alert Level</p>
-                    <p class="text-2xl font-bold mt-1 text-white">{{ $minQty }}</p>
+                    <p class="text-2xl font-bold mt-1 text-white">
+                        {{ $minQty }}
+                        @if($unitFriendly)
+                            <span class="text-sm opacity-70">{{ $unitFriendly }}</span>
+                        @endif
+                    </p>
                     <p class="text-white font-bold text-[10px] mt-1 opacity-70">Alert when below</p>
                 </div>
             </div>
@@ -160,7 +223,7 @@
                     <div class="flex-1">
                         <p class="text-white font-bold text-base uppercase tracking-wide">Low Stock Alert!</p>
                         <p class="text-white font-bold text-sm mt-0.5">
-                            Stock is below minimum level ({{ $stockQty }} remaining).
+                            Stock is below minimum level ({{ $stockQty }} {{ $unitFriendly }} remaining).
                         </p>
                     </div>
                 </div>
@@ -208,7 +271,7 @@
         </div>
     </div>
 
-    {{-- ✅ Edit button visible to Admin, Owner AND Cashier --}}
+    {{-- Edit button --}}
     @if(auth()->user()->isAdmin() || auth()->user()->isOwner() || auth()->user()->isCashier())
         <div class="flex gap-3">
             <a href="{{ route('products.edit', $product) }}"

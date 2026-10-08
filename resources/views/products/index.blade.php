@@ -217,12 +217,43 @@
                                 $stock = $product->stocks->firstWhere('store_id', $product->store_id);
                                 $stockQty = $stock ? (int) $stock->quantity : 0;
                                 $isLowStock = $stock && $stock->quantity <= $stock->min_quantity;
+
+                                // Resolve unit: product's own unit OR fall back to category config
+                                $unitLabel = $product->unit
+                                    ?? (config("category_specs.{$product->category->name}.unit") ?? null);
+
+                                // Friendly label map
+                                $unitFriendly = [
+                                    'pcs'   => 'pcs',
+                                    'set'   => 'set',
+                                    'pair'  => 'pair',
+                                    'pack'  => 'pack',
+                                    'box'   => 'box',
+                                    'bunch' => 'bunch',
+                                    'm2'    => 'm²',
+                                    'm'     => 'm',
+                                    'kg'    => 'kg',
+                                    'g'     => 'g',
+                                    'L'     => 'L',
+                                    'ml'    => 'ml',
+                                ][$unitLabel ?? ''] ?? $unitLabel;
+
+                                $unitColors = [
+                                    'pcs'   => 'bg-blue-500/30 border-blue-400/40',
+                                    'set'   => 'bg-purple-500/30 border-purple-400/40',
+                                    'pack'  => 'bg-emerald-500/30 border-emerald-400/40',
+                                    'box'   => 'bg-amber-500/30 border-amber-400/40',
+                                    'bunch' => 'bg-pink-500/30 border-pink-400/40',
+                                    'm2'    => 'bg-cyan-500/30 border-cyan-400/40',
+                                    'm'     => 'bg-teal-500/30 border-teal-400/40',
+                                ][$unitLabel ?? ''] ?? 'bg-slate-500/30 border-slate-400/40';
                             @endphp
                             <tr class="border-b border-blue-700/30 hover:bg-blue-800/40 transition {{ $i % 2 === 0 ? 'bg-blue-900/40' : 'bg-blue-800/20' }}">
                                 <td class="px-4 py-3 text-sm text-white font-bold border-r border-blue-700/30">
                                     {{ $products->firstItem() + $i }}
                                 </td>
 
+                                {{-- Product --}}
                                 <td class="px-4 py-3 border-r border-blue-700/30">
                                     <div class="flex items-center gap-2">
                                         <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center flex-shrink-0 shadow-lg">
@@ -232,9 +263,20 @@
                                             </svg>
                                         </div>
                                         <div class="min-w-0">
-                                            <p class="text-white font-bold text-sm truncate max-w-[200px]">
-                                                {{ $product->name }}
-                                            </p>
+                                            <div class="flex items-center gap-1.5 flex-wrap">
+                                                <p class="text-white font-bold text-sm truncate max-w-[200px]">
+                                                    {{ $product->name }}
+                                                </p>
+
+                                                {{-- UNIT BADGE --}}
+                                                @if($unitFriendly)
+                                                    <span class="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold uppercase border {{ $unitColors }} text-white flex-shrink-0"
+                                                          title="Sold per {{ $unitFriendly }}">
+                                                        {{ $unitFriendly }}
+                                                    </span>
+                                                @endif
+                                            </div>
+
                                             @if(!empty($product->specs) && is_array($product->specs))
                                                 @php
                                                     $firstSpec = array_slice($product->specs, 0, 1, true);
@@ -251,6 +293,7 @@
                                     </div>
                                 </td>
 
+                                {{-- Category --}}
                                 <td class="px-4 py-3 border-r border-blue-700/30">
                                     @if($product->category)
                                         <a href="{{ route('products.index', ['category' => $product->category->id]) }}"
@@ -263,6 +306,7 @@
                                     @endif
                                 </td>
 
+                                {{-- Store --}}
                                 <td class="px-4 py-3 border-r border-blue-700/30">
                                     @if($product->store)
                                         <span class="px-2 py-0.5 bg-cyan-500/30 text-white font-bold rounded-md text-xs border border-cyan-500/40">
@@ -273,16 +317,27 @@
                                     @endif
                                 </td>
 
+                                {{-- Price --}}
                                 <td class="px-4 py-3 text-sm text-white font-bold text-right border-r border-blue-700/30">
                                     TSh {{ number_format((float) $product->selling_price, 0) }}
+                                    @if($unitFriendly)
+                                        <span class="block text-white/60 text-[10px] font-bold">
+                                            per {{ $unitFriendly }}
+                                        </span>
+                                    @endif
                                 </td>
 
+                                {{-- Stock --}}
                                 <td class="px-4 py-3 text-center border-r border-blue-700/30">
                                     <span class="inline-block px-2 py-0.5 rounded-md text-xs font-bold {{ $isLowStock ? 'bg-red-500/30 text-white border border-red-400/40' : 'bg-green-500/30 text-white border border-green-400/40' }}">
                                         {{ $stockQty }}
+                                        @if($unitFriendly)
+                                            <span class="text-[9px] opacity-80">{{ $unitFriendly }}</span>
+                                        @endif
                                     </span>
                                 </td>
 
+                                {{-- Status --}}
                                 <td class="px-4 py-3 border-r border-blue-700/30">
                                     @if($product->is_active)
                                         <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-green-500/30 text-white border border-green-400/40">
@@ -295,6 +350,7 @@
                                     @endif
                                 </td>
 
+                                {{-- Added By --}}
                                 <td class="px-4 py-3 border-r border-blue-700/30">
                                     <div class="text-xs">
                                         <p class="text-white font-bold truncate max-w-[120px]">
@@ -306,6 +362,7 @@
                                     </div>
                                 </td>
 
+                                {{-- Actions --}}
                                 <td class="px-4 py-3">
                                     <div class="flex items-center justify-center gap-1">
                                         <a href="{{ route('products.show', $product) }}"
@@ -485,10 +542,8 @@
 
             if (!chips.length) return;
 
-            // --- Apply visibility based on search + expanded state ---
             function applyVisibility() {
                 const query = (searchInput?.value || '').trim().toLowerCase();
-
                 let visibleCount = 0;
 
                 chips.forEach((chip, index) => {
@@ -504,14 +559,11 @@
                     }
                 });
 
-                // No-results message
                 if (noResults) {
                     noResults.classList.toggle('hidden', !(query && visibleCount === 0));
                 }
 
-                // Toggle button visibility
                 if (toggleBtn) {
-                    // Hide "show more" while searching
                     if (query) {
                         toggleBtn.classList.add('hidden');
                     } else {
@@ -521,7 +573,6 @@
                 }
             }
 
-            // --- Toggle button ---
             if (toggleBtn) {
                 toggleBtn.addEventListener('click', function () {
                     expanded = !expanded;
@@ -538,7 +589,6 @@
                 });
             }
 
-            // --- Search input ---
             if (searchInput) {
                 searchInput.addEventListener('input', function () {
                     if (searchClear) {
@@ -548,7 +598,6 @@
                 });
             }
 
-            // --- Clear search ---
             if (searchClear) {
                 searchClear.addEventListener('click', function () {
                     searchInput.value = '';
@@ -558,7 +607,6 @@
                 });
             }
 
-            // --- Initial state ---
             applyVisibility();
         })();
     </script>

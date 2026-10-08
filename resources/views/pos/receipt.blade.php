@@ -147,7 +147,7 @@
             border-bottom: 1px solid #000;
             padding: 4px 0;
         }
-        table.items thead th.qty   { text-align: center; width: 28px; }
+        table.items thead th.qty   { text-align: center; width: 30px; }
         table.items thead th.price { text-align: right; width: 55px; }
         table.items thead th.total { text-align: right; width: 60px; }
 
@@ -168,10 +168,26 @@
             word-break: break-word;
             line-height: 1.3;
         }
+
+        /* ===== UNIT BADGE ===== */
+        .unit-badge {
+            display: inline-block;
+            padding: 1px 4px;
+            border-radius: 2px;
+            font-size: 8px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid #000;
+            margin-left: 4px;
+            vertical-align: middle;
+        }
+
         .item-meta {
             font-size: 9px;
             color: #666;
             margin-top: 1px;
+            line-height: 1.35;
         }
 
         /* ===== TOTALS ===== */
@@ -200,7 +216,7 @@
             font-size: 16px;
         }
 
-        /* ===== BADGE ===== */
+        /* ===== BADGE (payment method etc.) ===== */
         .badge {
             display: inline-block;
             font-size: 9px;
@@ -385,13 +401,55 @@
             </thead>
             <tbody>
                 @forelse($sale->items as $item)
+                    @php
+                        // Resolve unit label
+                        $product = $item->product;
+                        $unitRaw = $product->unit ?? null;
+
+                        // Fall back to category config if product has no unit
+                        if (!$unitRaw && $product && $product->category) {
+                            $cfg = config('category_specs.' . $product->category->name, []);
+                            $unitRaw = $cfg['unit'] ?? ($cfg['units'][0] ?? null);
+                        }
+
+                        $unitLabels = [
+                            'pcs'   => 'PCS',
+                            'piece' => 'PCS',
+                            'set'   => 'SET',
+                            'pair'  => 'PAIR',
+                            'pack'  => 'PACK',
+                            'box'   => 'BOX',
+                            'bunch' => 'BUNCH',
+                            'm2'    => 'M²',
+                            'sqm'   => 'M²',
+                            'm'     => 'M',
+                            'metre' => 'M',
+                            'kg'    => 'KG',
+                            'g'     => 'G',
+                            'litre' => 'L',
+                            'l'     => 'L',
+                            'ml'    => 'ML',
+                        ];
+
+                        $unitDisplay = '';
+                        if ($unitRaw) {
+                            $u = strtolower(trim($unitRaw));
+                            $unitDisplay = $unitLabels[$u] ?? strtoupper($unitRaw);
+                        }
+                    @endphp
                     <tr>
                         <td>
-                            <div class="item-name">{{ $item->product->name ?? 'Unknown Item' }}</div>
-                            @if(!empty($item->product->specs) && is_array($item->product->specs))
+                            <div class="item-name">
+                                {{ $item->product->name ?? 'Unknown Item' }}
+                                @if($unitDisplay)
+                                    <span class="unit-badge">{{ $unitDisplay }}</span>
+                                @endif
+                            </div>
+
+                            @if(!empty($product->specs) && is_array($product->specs))
                                 @php
                                     $specBits = [];
-                                    foreach ($item->product->specs as $k => $v) {
+                                    foreach ($product->specs as $k => $v) {
                                         if ($v === null || $v === '') continue;
                                         $specBits[] = ucwords(str_replace('_', ' ', $k)) . ': ' . $v;
                                     }
@@ -400,6 +458,10 @@
                                 @if($specLine)
                                     <div class="item-meta">{{ $specLine }}</div>
                                 @endif
+                            @endif
+
+                            @if($product && $product->size)
+                                <div class="item-meta">Size: {{ rtrim(rtrim(number_format((float) $product->size, 2, '.', ''), '0'), '.') }}</div>
                             @endif
                         </td>
                         <td class="qty">{{ $item->quantity }}</td>

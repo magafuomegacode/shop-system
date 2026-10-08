@@ -17,6 +17,55 @@ use Illuminate\Validation\Rule;
 class ProductController extends Controller
 {
     /**
+     * Case-insensitive category config lookup.
+     */
+    private function resolveCategoryConfig(?string $categoryName): array
+    {
+        if (!$categoryName) {
+            return [];
+        }
+
+        $allConfigs = config('category_specs', []);
+        $needle = strtolower(trim($categoryName));
+
+        foreach ($allConfigs as $key => $value) {
+            if (strtolower(trim($key)) === $needle) {
+                return is_array($value) ? $value : [];
+            }
+        }
+
+        return [];
+    }
+
+    /**
+     * Rudi list ya units halali kwa category.
+     * Inaunga mkono 'units' (array) na 'unit' (single).
+     */
+    private function resolveUnitsFromConfig(?string $categoryName): array
+    {
+        $cfg = $this->resolveCategoryConfig($categoryName);
+
+        if (!empty($cfg['units']) && is_array($cfg['units'])) {
+            return array_values($cfg['units']);
+        }
+
+        if (!empty($cfg['unit']) && is_string($cfg['unit'])) {
+            return [$cfg['unit']];
+        }
+
+        return [];
+    }
+
+    /**
+     * Unit ya kwanza kama default.
+     */
+    private function resolveDefaultUnitFromConfig(?string $categoryName): ?string
+    {
+        $units = $this->resolveUnitsFromConfig($categoryName);
+        return $units[0] ?? null;
+    }
+
+    /**
      * Display a listing of products.
      */
     public function index(Request $request)
@@ -83,6 +132,10 @@ class ProductController extends Controller
 
     /**
      * Step 2: Show the form for creating a new product.
+     *
+     * Multi-unit support:
+     *   - $categoryUnits = list ya units zote
+     *   - $categoryUnit  = default (ya kwanza kwenye list)
      */
     public function create(Request $request)
     {
@@ -108,9 +161,23 @@ class ProductController extends Controller
             ? $categories->firstWhere('id', (int) $selectedCategoryId)?->name
             : null;
 
-        $categorySpecs = $selectedCategoryName
-            ? (config("category_specs.{$selectedCategoryName}") ?? [])
-            : [];
+        // ✅ Case-insensitive config lookup
+        $categoryConfig = $this->resolveCategoryConfig($selectedCategoryName);
+
+        $categorySpecs = [];
+        $categoryUnits = [];
+        $categoryUnit  = null;
+
+        if (!empty($categoryConfig)) {
+            $categorySpecs = $categoryConfig['fields'] ?? [];
+            $categoryUnits = $this->resolveUnitsFromConfig($selectedCategoryName);
+            $categoryUnit  = $categoryUnits[0] ?? null;
+        }
+
+        $categorySpecs = collect($categorySpecs)
+            ->filter(fn($s) => is_array($s))
+            ->values()
+            ->toArray();
 
         return view('products.create', compact(
             'stores',
@@ -118,7 +185,9 @@ class ProductController extends Controller
             'selectedStoreId',
             'selectedCategoryId',
             'selectedCategoryName',
-            'categorySpecs'
+            'categorySpecs',
+            'categoryUnits',
+            'categoryUnit'
         ));
     }
 
@@ -129,7 +198,6 @@ class ProductController extends Controller
     {
         $user = Auth::user();
 
-        // ✅ sku & unit are optional now (form no longer submits them)
         $validated = $request->validate([
             'store_id'      => ['required', 'exists:stores,id'],
             'category_id'   => ['required', 'exists:categories,id'],
@@ -157,6 +225,18 @@ class ProductController extends Controller
             ->filter(fn($v) => $v !== null && $v !== '')
             ->toArray();
 
+        // ✅ Unit — tumia iliyotumwa, la sivyo default ya kwanza
+        $unit = $validated['unit'] ?? null;
+        if (!$unit) {
+            $unit = $this->resolveDefaultUnitFromConfig($category->name);
+        }
+
+        // Thibitisha unit ni halali kwa category
+        $allowedUnits = $this->resolveUnitsFromConfig($category->name);
+        if ($unit && !empty($allowedUnits) && !in_array($unit, $allowedUnits, true)) {
+            $unit = $allowedUnits[0] ?? null;
+        }
+
         DB::beginTransaction();
 
         try {
@@ -165,7 +245,7 @@ class ProductController extends Controller
                 'category_id'   => $category->id,
                 'name'          => $validated['name'],
                 'sku'           => $validated['sku'] ?? null,
-                'unit'          => $validated['unit'] ?? null,   // ✅ nullable
+                'unit'          => $unit,
                 'size'          => $validated['size'] ?? null,
                 'specs'         => $specs ?: null,
                 'cost_price'    => $validated['cost_price'] ?? null,
@@ -205,6 +285,7 @@ class ProductController extends Controller
                     'category' => $category->name,
                     'quantity' => $validated['quantity'],
                     'specs'    => $specs,
+                    'unit'     => $unit,
                 ]
             );
 
@@ -212,7 +293,7 @@ class ProductController extends Controller
                 $user->shop_id,
                 'product_added',
                 'New Product Added',
-                "{$product->name} was added to {$store->name} ({$category->name}) with {$validated['quantity']} units stock",
+                "{$product->name} was added to {$store->name} ({$category->name}) with {$validated['quantity']} " . ($unit ?? 'units') . " stock",
                 route('products.show', $product),
                 'plus-circle'
             );
@@ -222,7 +303,7 @@ class ProductController extends Controller
                     $user->shop_id,
                     'low_stock',
                     'Low Stock Alert',
-                    "{$product->name} has low stock ({$validated['quantity']} units) in {$store->name}",
+                    "{$product->name} has low stock ({$validated['quantity']} " . ($unit ?? 'units') . ") in {$store->name}",
                     route('products.show', $product),
                     'alert-triangle'
                 );
@@ -233,7 +314,7 @@ class ProductController extends Controller
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
                     'success'  => true,
-                    'message'  => "Product '{$product->name}' created with {$validated['quantity']} units stock in {$store->name}!",
+                    'message'  => "Product '{$product->name}' created with {$validated['quantity']} " . ($unit ?? 'units') . " stock in {$store->name}!",
                     'product'  => $product,
                     'redirect' => route('products.index'),
                 ]);
@@ -241,7 +322,7 @@ class ProductController extends Controller
 
             return redirect()
                 ->route('products.index')
-                ->with('success', "Product '{$product->name}' created with {$validated['quantity']} units stock in {$store->name}!");
+                ->with('success', "Product '{$product->name}' created successfully!");
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -310,9 +391,24 @@ class ProductController extends Controller
 
         $selectedCategoryName = $product->category->name ?? null;
 
-        $categorySpecs = $selectedCategoryName
-            ? (config("category_specs.{$selectedCategoryName}") ?? [])
-            : [];
+        // ✅ Case-insensitive config lookup
+        $categoryConfig = $this->resolveCategoryConfig($selectedCategoryName);
+
+        $categorySpecs = [];
+        $categoryUnits = [];
+        $categoryUnit  = null;
+
+        if (!empty($categoryConfig)) {
+            $categorySpecs = $categoryConfig['fields'] ?? [];
+            $categoryUnits = $this->resolveUnitsFromConfig($selectedCategoryName);
+            $categoryUnit  = $product->unit
+                ?: ($categoryUnits[0] ?? null);
+        }
+
+        $categorySpecs = collect($categorySpecs)
+            ->filter(fn($s) => is_array($s))
+            ->values()
+            ->toArray();
 
         return view('products.edit', compact(
             'product',
@@ -320,7 +416,9 @@ class ProductController extends Controller
             'categories',
             'stock',
             'selectedCategoryName',
-            'categorySpecs'
+            'categorySpecs',
+            'categoryUnits',
+            'categoryUnit'
         ));
     }
 
@@ -337,7 +435,6 @@ class ProductController extends Controller
             abort(403, 'Only Admin, Owner, or Cashier can update products.');
         }
 
-        // ✅ sku & unit optional
         $validated = $request->validate([
             'store_id'      => ['required', 'exists:stores,id'],
             'category_id'   => ['required', 'exists:categories,id'],
@@ -365,12 +462,24 @@ class ProductController extends Controller
             ->filter(fn($v) => $v !== null && $v !== '')
             ->toArray();
 
+        // ✅ Unit — tumia iliyotumwa, la sivyo default
+        $unit = $validated['unit'] ?? null;
+        if (!$unit) {
+            $unit = $this->resolveDefaultUnitFromConfig($category->name);
+        }
+
+        // Thibitisha unit ni halali
+        $allowedUnits = $this->resolveUnitsFromConfig($category->name);
+        if ($unit && !empty($allowedUnits) && !in_array($unit, $allowedUnits, true)) {
+            $unit = $allowedUnits[0] ?? null;
+        }
+
         DB::beginTransaction();
 
         try {
             $oldValues = $product->only([
                 'name', 'selling_price', 'cost_price',
-                'store_id', 'category_id', 'is_active', 'specs',
+                'store_id', 'category_id', 'is_active', 'specs', 'unit',
             ]);
 
             $product->update([
@@ -378,7 +487,7 @@ class ProductController extends Controller
                 'category_id'   => $category->id,
                 'name'          => $validated['name'],
                 'sku'           => $validated['sku'] ?? null,
-                'unit'          => $validated['unit'] ?? null,
+                'unit'          => $unit,
                 'size'          => $validated['size'] ?? null,
                 'specs'         => $specs ?: null,
                 'cost_price'    => $validated['cost_price'] ?? null,
@@ -419,7 +528,7 @@ class ProductController extends Controller
                 $oldValues,
                 $product->only([
                     'name', 'selling_price', 'cost_price',
-                    'store_id', 'category_id', 'is_active', 'specs',
+                    'store_id', 'category_id', 'is_active', 'specs', 'unit',
                 ])
             );
 
@@ -428,7 +537,7 @@ class ProductController extends Controller
                     $user->shop_id,
                     'low_stock',
                     'Low Stock Alert',
-                    "{$product->name} has low stock ({$newQuantity} units) in {$store->name}",
+                    "{$product->name} has low stock ({$newQuantity} " . ($unit ?? 'units') . ") in {$store->name}",
                     route('products.show', $product),
                     'alert-triangle'
                 );
@@ -523,7 +632,7 @@ class ProductController extends Controller
             fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
             fputcsv($file, [
-                'No.', 'Product Name', 'Store', 'Category',
+                'No.', 'Product Name', 'Store', 'Category', 'Unit',
                 'Specs', 'Stock', 'Min Stock', 'Cost Price', 'Selling Price', 'Profit',
                 'Status', 'Added By', 'Role', 'Date Added',
             ]);
@@ -542,11 +651,18 @@ class ProductController extends Controller
                     $specsDisplay = implode(' | ', $pairs);
                 }
 
+                // ✅ Unit fallback
+                $unit = $p->unit;
+                if (!$unit && $p->category) {
+                    $unit = $this->resolveDefaultUnitFromConfig($p->category->name);
+                }
+
                 fputcsv($file, [
                     $i + 1,
                     $p->name,
                     $p->store->name ?? '-',
                     $p->category->name ?? '-',
+                    $unit ? strtoupper($unit) : '-',
                     $specsDisplay,
                     $stock->quantity ?? 0,
                     $stock->min_quantity ?? '-',

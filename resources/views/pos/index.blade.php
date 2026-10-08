@@ -267,7 +267,6 @@
                 searchTimer = setTimeout(loadProducts, 220);
             });
 
-            // Keyboard: "/" focuses search
             document.addEventListener('keydown', function (e) {
                 if (e.key === '/' && document.activeElement !== searchInput) {
                     e.preventDefault();
@@ -314,20 +313,48 @@
                     });
             }
 
-            // === SIZE + UNIT FORMAT: "500ml", "1.5kg", "1L" ===
-            function buildSizeUnitDisplay(size, unit) {
-                if (!size || !unit) return '';
+            /**
+             * Build the display text for a product.
+             * Uses product's unit (pcs, set, m2, box, etc.) + size.
+             * Examples: "SET", "3 m2", "500 ml", "M2"
+             */
+            function buildUnitDisplay(product) {
+                const unitRaw = (product.unit || '').toString().trim().toLowerCase();
 
+                // Friendly label map
                 const unitLabels = {
-                    kg: 'kg', g: 'g', litre: 'L', ml: 'ml', metre: 'm',
+                    pcs:   'PCS',
+                    piece: 'PCS',
+                    set:   'SET',
+                    pair:  'PAIR',
+                    pack:  'PACK',
+                    box:   'BOX',
+                    bunch: 'BUNCH',
+                    m2:    'M²',
+                    sqm:   'M²',
+                    m:     'M',
+                    metre: 'M',
+                    kg:    'KG',
+                    g:     'G',
+                    litre: 'L',
+                    l:     'L',
+                    ml:    'ML',
                 };
-                const shortUnit = unitLabels[unit] || unit;
 
-                let sizeValue = String(size);
-                if (sizeValue.indexOf('.') !== -1) {
-                    sizeValue = sizeValue.replace(/\.?0+$/, '');
+                const friendlyUnit = unitLabels[unitRaw] || (unitRaw ? unitRaw.toUpperCase() : '');
+
+                // If size is available and unit is metric (m2, m, kg, ml, etc.), show "SIZE UNIT" e.g. "3 M²"
+                const size = product.size;
+
+                if (size !== null && size !== undefined && size !== '' && friendlyUnit) {
+                    let sizeValue = String(size);
+                    if (sizeValue.indexOf('.') !== -1) {
+                        sizeValue = sizeValue.replace(/\.?0+$/, '');
+                    }
+                    return sizeValue + ' ' + friendlyUnit;
                 }
-                return sizeValue + shortUnit;
+
+                return friendlyUnit;
             }
 
             function renderProducts(products) {
@@ -351,10 +378,7 @@
                 let html = '';
                 products.forEach(function (p) {
                     const disabled = p.stock <= 0;
-                    const sizeUnitDisplay = buildSizeUnitDisplay(p.size, p.unit);
-                    const specDisplay = p.specs && p.specs.volume_ml
-                        ? p.specs.volume_ml + 'ml'
-                        : (p.specs && p.specs.fragrance_family ? p.specs.fragrance_family : null);
+                    const unitDisplay = buildUnitDisplay(p);
 
                     html += `<button type="button"
                         data-id="${p.id}"
@@ -362,8 +386,7 @@
                         data-price="${p.selling_price}"
                         data-stock="${p.stock}"
                         data-unit="${escapeAttr(p.unit || '')}"
-                        data-size="${escapeAttr(p.size || '')}"
-                        data-size-unit="${escapeAttr(sizeUnitDisplay)}"
+                        data-unit-display="${escapeAttr(unitDisplay)}"
                         class="product-btn text-left bg-blue-900/40 border border-blue-700/50 hover:border-cyan-400/80 hover:bg-blue-800/60 rounded-xl p-3 transition group ${disabled ? 'opacity-40 cursor-not-allowed' : 'hover:shadow-lg hover:shadow-cyan-500/20 active:scale-95'}"
                         ${disabled ? 'disabled' : ''}>
 
@@ -372,9 +395,9 @@
                             ${disabled ? '<span class="text-[9px] px-1.5 py-0.5 rounded bg-red-500/30 text-white font-bold border border-red-400/40 uppercase flex-shrink-0">Out</span>' : ''}
                         </div>
 
-                        ${sizeUnitDisplay || specDisplay ? `
+                        ${unitDisplay ? `
                             <p class="text-cyan-400 font-bold text-[11px] mb-1">
-                                ${escapeHtml(sizeUnitDisplay || specDisplay)}
+                                ${escapeHtml(unitDisplay)}
                             </p>
                         ` : ''}
 
@@ -385,7 +408,9 @@
                                 <div class="h-full ${p.stock <= 5 ? 'bg-red-500' : (p.stock <= 10 ? 'bg-yellow-500' : 'bg-green-500')}"
                                      style="width: ${Math.min(100, (p.stock / 20) * 100)}%"></div>
                             </div>
-                            <p class="text-white font-bold text-[10px] opacity-70 flex-shrink-0">${p.stock}</p>
+                            <p class="text-white font-bold text-[10px] opacity-70 flex-shrink-0">
+                                ${p.stock}${unitDisplay ? ' ' + unitDisplay : ''}
+                            </p>
                         </div>
                     </button>`;
                 });
@@ -400,23 +425,30 @@
                             parseFloat(this.dataset.price),
                             parseInt(this.dataset.stock),
                             this.dataset.unit,
-                            this.dataset.size,
-                            this.dataset.sizeUnit
+                            this.dataset.unitDisplay
                         );
                     });
                 });
             }
 
             // === CART ===
-            function addToCart(id, name, price, stock, unit, size, sizeUnit) {
+            function addToCart(id, name, price, stock, unit, unitDisplay) {
                 if (cart[id]) {
                     if (cart[id].quantity >= stock) {
-                        flashToast('Only ' + stock + ' available in stock', 'warning');
+                        flashToast('Only ' + stock + ' ' + (unitDisplay || '') + ' available', 'warning');
                         return;
                     }
                     cart[id].quantity += 1;
                 } else {
-                    cart[id] = { id, name, price, quantity: 1, stock, unit, size, sizeUnit };
+                    cart[id] = {
+                        id,
+                        name,
+                        price,
+                        quantity: 1,
+                        stock,
+                        unit,
+                        unitDisplay
+                    };
                 }
                 renderCart();
             }
@@ -427,7 +459,7 @@
                 if (newQty <= 0) {
                     delete cart[id];
                 } else if (newQty > cart[id].stock) {
-                    flashToast('Only ' + cart[id].stock + ' available', 'warning');
+                    flashToast('Only ' + cart[id].stock + ' ' + (cart[id].unitDisplay || '') + ' available', 'warning');
                     return;
                 } else {
                     cart[id].quantity = newQty;
@@ -459,8 +491,8 @@
                     ids.forEach(function (id) {
                         const item = cart[id];
                         let displayName = escapeHtml(item.name);
-                        if (item.sizeUnit) {
-                            displayName += ' <span class="text-cyan-400 font-bold">(' + escapeHtml(item.sizeUnit) + ')</span>';
+                        if (item.unitDisplay) {
+                            displayName += ' <span class="text-cyan-400 font-bold">(' + escapeHtml(item.unitDisplay) + ')</span>';
                         }
 
                         html += `
@@ -604,7 +636,7 @@
                 return String(str).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
             }
 
-            // === TOAST NOTIFICATIONS ===
+            // === TOAST ===
             function flashToast(message, type = 'success') {
                 const colors = {
                     success: 'from-green-600 to-emerald-600 border-green-400',

@@ -9,6 +9,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\StockMovementController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -117,13 +118,16 @@ Route::middleware('auth')->group(function () {
             ->name('products.download.report');
 
         // 🆕 Category chooser — step 1 of the add-product flow
-        // Must be declared BEFORE Route::resource('products', ...)
-        // otherwise "categories" would be interpreted as a {product} ID.
         Route::get('products/categories', [ProductController::class, 'chooseCategory'])
             ->name('products.categories');
 
         // Products resource
         Route::resource('products', ProductController::class);
+
+        // 📦 Stock Movements — inventory log (in/out, who & when)
+        Route::prefix('stock-movements')->name('stock-movements.')->group(function () {
+            Route::get('/', [StockMovementController::class, 'index'])->name('index');
+        });
 
         // POS
         Route::prefix('pos')->name('pos.')->group(function () {

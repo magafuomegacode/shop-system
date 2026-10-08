@@ -57,6 +57,16 @@
             <span class="text-sm font-bold text-white">Products</span>
         </a>
 
+        {{-- Stock Movements (Admin, Owner & Cashier) --}}
+        <a href="{{ route('stock-movements.index') }}"
+           class="sidebar-link flex items-center gap-3 px-3 py-3 rounded-xl transition {{ request()->routeIs('stock-movements.*') ? 'bg-white/15 text-white' : 'text-white hover:bg-white/10' }}">
+            <svg class="w-5 h-5 flex-shrink-0 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+            </svg>
+            <span class="text-sm font-bold text-white">Stock Movements</span>
+        </a>
+
         {{-- Sales (POS) --}}
         <a href="{{ route('pos.index') }}"
            class="sidebar-link flex items-center gap-3 px-3 py-3 rounded-xl transition {{ request()->routeIs('pos.*') ? 'bg-white/15 text-white' : 'text-white hover:bg-white/10' }}">

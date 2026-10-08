@@ -193,6 +193,26 @@
 
         .mono { font-family: 'SF Mono', 'Consolas', 'Monaco', monospace; }
 
+        /* Unit badge */
+        .unit-badge {
+            display: inline-block;
+            padding: 1px 5px;
+            border-radius: 3px;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            border: 1px solid;
+        }
+        .unit-pcs   { background: #dbeafe; color: #1e40af; border-color: #93c5fd; }
+        .unit-set   { background: #f3e8ff; color: #6b21a8; border-color: #d8b4fe; }
+        .unit-pack  { background: #d1fae5; color: #065f46; border-color: #6ee7b7; }
+        .unit-box   { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
+        .unit-bunch { background: #fce7f3; color: #9d174d; border-color: #f9a8d4; }
+        .unit-m2    { background: #cffafe; color: #155e75; border-color: #67e8f9; }
+        .unit-m     { background: #ccfbf1; color: #115e59; border-color: #5eead4; }
+        .unit-default { background: #e2e8f0; color: #334155; border-color: #cbd5e1; }
+
         @media print {
             .bordered-table { font-size: 10px; }
             .bordered-table th,
@@ -221,6 +241,13 @@
             .summary-card.purple,
             .summary-card.emerald {
                 background: #f1f5f9 !important;
+            }
+            .unit-badge {
+                background: #f1f5f9 !important;
+                color: #000 !important;
+                border-color: #000 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
             }
         }
 
@@ -412,8 +439,9 @@
                                 <th class="text-center w-10">#</th>
                                 <th class="text-left">Product</th>
                                 <th class="text-left w-32">Category</th>
+                                <th class="text-center w-14">Unit</th>
                                 <th class="text-left w-40">Specs</th>
-                                <th class="text-center w-16">Stock</th>
+                                <th class="text-center w-20">Stock</th>
                                 <th class="text-right w-20">Cost</th>
                                 <th class="text-right w-24">Selling</th>
                                 <th class="text-right w-28">Added By</th>
@@ -427,6 +455,30 @@
                                     $stockQty = $stock ? (int) $stock->quantity : 0;
                                     $minQty = $stock ? (int) $stock->min_quantity : 5;
                                     $isLowStock = $stockQty <= $minQty;
+
+                                    // Resolve unit
+                                    $unitLabel = $product->unit
+                                        ?? (config("category_specs.{$product->category->name}.unit") ?? null);
+
+                                    $unitFriendly = [
+                                        'pcs'   => 'pcs',
+                                        'set'   => 'set',
+                                        'pair'  => 'pair',
+                                        'pack'  => 'pack',
+                                        'box'   => 'box',
+                                        'bunch' => 'bunch',
+                                        'm2'    => 'm²',
+                                        'm'     => 'm',
+                                        'kg'    => 'kg',
+                                        'g'     => 'g',
+                                        'L'     => 'L',
+                                        'ml'    => 'ml',
+                                    ][$unitLabel ?? ''] ?? $unitLabel;
+
+                                    $unitClass = 'unit-' . ($unitLabel ?? 'default');
+                                    if (!in_array($unitLabel, ['pcs','set','pack','box','bunch','m2','m'])) {
+                                        $unitClass = 'unit-default';
+                                    }
 
                                     // Build specs display
                                     $specsDisplay = '—';
@@ -449,11 +501,23 @@
                                     <td class="text-slate-700 text-xs">
                                         {{ $product->category->name ?? '—' }}
                                     </td>
+                                    <td class="text-center">
+                                        @if($unitFriendly)
+                                            <span class="unit-badge {{ $unitClass }}">
+                                                {{ $unitFriendly }}
+                                            </span>
+                                        @else
+                                            <span class="text-slate-400 text-xs">—</span>
+                                        @endif
+                                    </td>
                                     <td class="text-slate-600 text-xs">
                                         {{ $specsDisplay }}
                                     </td>
                                     <td class="text-center font-semibold {{ $isLowStock ? 'text-red-600' : 'text-slate-900' }}">
                                         {{ $stockQty }}
+                                        @if($unitFriendly)
+                                            <span class="text-[9px] font-normal text-slate-500">{{ $unitFriendly }}</span>
+                                        @endif
                                     </td>
                                     <td class="text-right text-slate-600">
                                         {{ $product->cost_price ? number_format((float) $product->cost_price, 0) : '—' }}
@@ -469,7 +533,7 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="4" class="text-left uppercase text-xs tracking-wide">Subtotal</td>
+                                <td colspan="5" class="text-left uppercase text-xs tracking-wide">Subtotal</td>
                                 <td class="text-center">
                                     @php
                                         $storeStockTotal = 0;

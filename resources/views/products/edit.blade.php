@@ -83,9 +83,7 @@
         @csrf
         @method('PUT')
 
-        {{-- ===================================================== --}}
         {{-- SECTION 1: Added By (read-only) --}}
-        {{-- ===================================================== --}}
         <div>
             <label class="block text-xs font-semibold text-white mb-2">Added By</label>
             <div class="flex items-center gap-2 bg-blue-900/40 backdrop-blur border border-blue-700/50 rounded-xl px-4 py-3">
@@ -104,9 +102,7 @@
             </div>
         </div>
 
-        {{-- ===================================================== --}}
         {{-- SECTION 2: Store & Category context --}}
-        {{-- ===================================================== --}}
         <div>
             <h3 class="text-white font-bold text-sm mb-3 flex items-center gap-2">
                 <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -134,7 +130,7 @@
                     </select>
                 </div>
 
-                {{-- Category (locked/read-only — to change, pick a different product category path) --}}
+                {{-- Category (locked) --}}
                 <div>
                     <label class="block text-xs font-semibold text-white mb-2">
                         Category <span class="text-red-400">*</span>
@@ -154,9 +150,7 @@
             </div>
         </div>
 
-        {{-- ===================================================== --}}
         {{-- SECTION 3: Basic info --}}
-        {{-- ===================================================== --}}
         <div class="border-t border-blue-700/50 pt-5">
             <h3 class="text-white font-bold text-sm mb-3 flex items-center gap-2">
                 <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -166,19 +160,44 @@
                 Basic Information
             </h3>
 
-            <div>
-                <label for="name" class="block text-xs font-semibold text-white mb-2">
-                    Product Name <span class="text-red-400">*</span>
-                </label>
-                <input type="text" name="name" id="name" value="{{ old('name', $product->name) }}" required
-                       placeholder="e.g. Coca Cola 500ml"
-                       class="w-full bg-blue-900/40 border border-blue-700/50 text-white placeholder-blue-200/40 px-4 py-3 rounded-xl outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
+            <div class="space-y-4">
+                <div>
+                    <label for="name" class="block text-xs font-semibold text-white mb-2">
+                        Product Name <span class="text-red-400">*</span>
+                    </label>
+                    <input type="text" name="name" id="name" value="{{ old('name', $product->name) }}" required
+                           placeholder="e.g. Coca Cola 500ml"
+                           class="w-full bg-blue-900/40 border border-blue-700/50 text-white placeholder-blue-200/40 px-4 py-3 rounded-xl outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition">
+                </div>
+
+                {{-- AUTO-DETECTED UNIT OF SALE --}}
+                @if(isset($categoryUnit) && $categoryUnit)
+                    <div class="bg-blue-900/40 border border-cyan-500/50 rounded-xl px-4 py-3 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center flex-shrink-0 shadow-lg">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                      d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-white font-bold text-[10px] uppercase tracking-wider opacity-70">
+                                Unit of Sale
+                            </p>
+                            <p class="text-white font-bold text-sm uppercase">
+                                {{ $categoryUnit }}
+                            </p>
+                        </div>
+                        <span class="text-white font-bold text-[10px] px-2 py-1 rounded-lg bg-cyan-500/30 border border-cyan-400/40 uppercase">
+                            Auto
+                        </span>
+                    </div>
+
+                    <input type="hidden" name="unit" value="{{ $categoryUnit }}">
+                @endif
             </div>
         </div>
 
-        {{-- ===================================================== --}}
         {{-- SECTION 4: Category-specific specs --}}
-        {{-- ===================================================== --}}
         @if(!empty($categorySpecs))
             <div class="border-t border-blue-700/50 pt-5">
                 <h3 class="text-white font-bold text-sm mb-3 flex items-center gap-2">
@@ -195,6 +214,8 @@
                     @endphp
 
                     @foreach($categorySpecs as $spec)
+                        @if(!is_array($spec)) @continue @endif
+
                         @php
                             $specKey = $spec['name'];
                             $specValue = old("specs.{$specKey}", $existingSpecs[$specKey] ?? '');
@@ -243,9 +264,7 @@
             </div>
         @endif
 
-        {{-- ===================================================== --}}
         {{-- SECTION 5: Pricing --}}
-        {{-- ===================================================== --}}
         <div class="border-t border-blue-700/50 pt-5">
             <h3 class="text-white font-bold text-sm mb-3 flex items-center gap-2">
                 <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -282,9 +301,7 @@
             </div>
         </div>
 
-        {{-- ===================================================== --}}
         {{-- SECTION 6: Stock --}}
-        {{-- ===================================================== --}}
         <div class="border-t border-blue-700/50 pt-5">
             <h3 class="text-white font-bold text-sm mb-3 flex items-center gap-2">
                 <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
