@@ -15,19 +15,33 @@
     {{-- Header --}}
     <div class="fade-in-up d-1 bg-gradient-to-br from-blue-950 via-blue-900 to-blue-950 rounded-2xl p-5 mb-6 relative overflow-hidden shadow-2xl border border-blue-700/50">
         <div class="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full -mr-20 -mt-20 pointer-events-none"></div>
-        <div class="relative z-10 flex items-center gap-3">
-            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center flex-shrink-0 shadow-lg">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+
+        <div class="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-3 min-w-0">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center flex-shrink-0 shadow-lg">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M7 7h.01M7 3h5a2 2 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"/>
+                    </svg>
+                </div>
+                <div class="min-w-0">
+                    <h2 class="text-white font-bold text-xl">Choose a Category</h2>
+                    <p class="text-white font-bold text-xs mt-1 opacity-80">
+                        Adding product to <span class="text-cyan-300">{{ $store->name }}</span>
+                    </p>
+                </div>
+            </div>
+
+            {{-- ✅ Switch Store button --}}
+            <a href="{{ route('stores.index') }}"
+               class="flex-shrink-0 bg-blue-900/40 hover:bg-blue-800/60 border border-blue-700/50 hover:border-cyan-400/60 text-white font-bold text-sm px-4 py-2.5 rounded-xl flex items-center gap-2 transition shadow-lg">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round"
-                          d="M7 7h.01M7 3h5a2 2 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"/>
+                          d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
                 </svg>
-            </div>
-            <div class="min-w-0">
-                <h2 class="text-white font-bold text-xl">Choose a Category</h2>
-                <p class="text-white font-bold text-xs mt-1 opacity-80">
-                    Adding product to <span class="text-cyan-300">{{ $store->name }}</span>
-                </p>
-            </div>
+                <span class="hidden sm:inline">Switch Store</span>
+                <span class="sm:hidden">Switch</span>
+            </a>
         </div>
     </div>
 
@@ -156,17 +170,14 @@
                     }
                 });
 
-                // toggle clear button
                 clearBtn.classList.toggle('hidden', !q);
 
-                // count badge
                 if (q) {
                     countBadge.textContent = visible + ' of ' + totalCount;
                 } else {
                     countBadge.textContent = totalCount + ' total';
                 }
 
-                // no-results message
                 noResults.classList.toggle('hidden', visible > 0);
             }
 
@@ -178,7 +189,6 @@
                 input.focus();
             });
 
-            // Keyboard shortcut: "/" focuses search
             document.addEventListener('keydown', function (e) {
                 if (e.key === '/' && document.activeElement !== input) {
                     e.preventDefault();
