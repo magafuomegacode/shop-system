@@ -18,6 +18,36 @@ class StoreAndCategorySeeder extends Seeder
             return;
         }
 
+        // ============================================================
+        // 🧹 STEP 1 — Cleanup: delete all stores except SCENTS & DECOR
+        // ============================================================
+        $keepStores = ['SCENTS', 'DECOR'];
+
+        $storesToDelete = Store::where('shop_id', $shop->id)
+            ->whereNotIn('name', $keepStores)
+            ->get();
+
+        foreach ($storesToDelete as $oldStore) {
+            // Detach categories first
+            Category::where('store_id', $oldStore->id)->update(['store_id' => null]);
+            $oldStore->delete();
+            $this->command->warn("🗑️  Deleted old store: {$oldStore->name}");
+        }
+
+        // ============================================================
+        // 🧹 STEP 2 — Cleanup: delete orphaned categories
+        //          (any category with store_id = null)
+        // ============================================================
+        $orphanedCategories = Category::whereNull('store_id')->get();
+
+        foreach ($orphanedCategories as $cat) {
+            $cat->delete();
+            $this->command->warn("🗑️  Deleted orphan category: {$cat->name}");
+        }
+
+        // ============================================================
+        // 🌱 STEP 3 — Seed the 2 stores and their categories
+        // ============================================================
         $data = [
 
             // ================= SCENTS =================
@@ -54,45 +84,13 @@ class StoreAndCategorySeeder extends Seeder
                 'Standing Lamps',
                 '2mtrs Turkish Curtains',
                 '1.5mtrs Chance Curtains',
-            ],
 
-            // ================= CARPET =================
-            'CARPET' => [
-                'Floor Carpet',
-                'Wall-to-Wall Carpet',
-                'Carpet Tiles',
-            ],
-
-            // ================= FLOWERS =================
-            'FLOWERS' => [
-                'Artificial Flowers',
-                'Natural Flowers',
-                'Flower Vases',
-                'Flower Arrangements',
-            ],
-
-            // ================= RUGS =================
-            'RUGS' => [
-                'Small Rugs',
-                'Medium Rugs',
-                'Large Rugs',
-                'Round Rugs',
-            ],
-
-            // ================= ARTIFICIAL FOUNTAIN DECOR =================
-            'ARTIFICIAL FOUNTAIN DECOR' => [
-                'Indoor Fountains',
-                'Outdoor Fountains',
-                'Tabletop Fountains',
-                'Wall Fountains',
-            ],
-
-            // ================= DOOR MATS =================
-            'DOOR MATS' => [
-                'Indoor Door Mats',
-                'Outdoor Door Mats',
-                'Rubber Door Mats',
-                'Coir Door Mats',
+                // Merged in from old standalone stores
+                'ARTIFICIAL FOUNTAIN DECOR',
+                'CARPET',
+                'DOOR MATS',
+                'FLOWERS',
+                'RUGS',
             ],
         ];
 
@@ -103,9 +101,6 @@ class StoreAndCategorySeeder extends Seeder
 
             $type = ($storeName === 'SCENTS') ? 'scent' : 'decor';
 
-            // ============================================================
-            // Find the store by NAME (matches what you already created online)
-            // ============================================================
             $store = Store::firstOrCreate(
                 [
                     'shop_id' => $shop->id,
@@ -126,9 +121,6 @@ class StoreAndCategorySeeder extends Seeder
 
             foreach ($categories as $categoryName) {
 
-                // ✅ CHANGED: updateOrCreate with store_id
-                // - If category exists → sets store_id
-                // - If category is new   → creates it with store_id
                 $category = Category::updateOrCreate(
                     ['name' => $categoryName],
                     [
